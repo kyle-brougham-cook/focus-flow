@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0 # generic hooks (trailing-whitespace, end-of-file-fixer, etc.)
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/psf/black
+    rev: 24.3.0 # Black 24.3.0 supports Python 3.13
+    hooks:
+      - id: black
+        args: [--line-length=88]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0 # Flake8 6.1.0 works on 3.13
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear==23.12.0
+        args:
+          - --max-line-length=88
+          - --select=E,F,W,B

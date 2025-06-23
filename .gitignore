@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+.env/
+.mypy_cache/
+
+# Virtual env
+venv/
+.env
+
+# Flask instance folder
+instance/
+
+# VSCode stuff
+.vscode/
+.idea/
+.DS_Store
+.code-workspace
+
+# DB backups or logs
+*.sqlite3
+*.log
+*.DB
+*.db
+*.db-journal
+/migrations
+
+# Certs
+awa.com-key.pem
+awa.com.pem
+
+# Thing not yet implemented
+signUpJSLogic.js
+forgot_password.html
+to-do.txt
+.env
+*.pem
+*.key
