@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Signup - FocusFlow{% endblock %}
+{% block content %}
+    <h1>Create Account</h1>
+    <form action="{{ url_for('auth.create_New_User_Account') }}" method="post">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for m in messages %}
+                    <li style="color: red;">{{m}}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <label>Username</label>
+        <input id="userSignUpUsername" type="text" name="user_name" autocomplete="off" required />
+
+        <label >Email</label>
+        <input id="userSignUpEmail" type="Email" name="user_email" autocomplete="off" required />
+
+        <label>Password</label>
+        <input id="userSignUpPassword" type="password" name="user_password" autocomplete="off" required />
+
+        <button id="confirmBtn" type="submit">Submit</button>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,154 @@
+/*********************************************************************
+ * File: style.css
+ * Purpose: Contains all CSS rules for the FocusFlow App including:
+ *   - Responsive layout adjustments
+ *   - Task and button styling
+ *   - Custom scrollbar styling
+ *********************************************************************/
+
+/* Responsive design for smaller screens */
+@media (max-width: 900px) {
+    .tasks {
+        margin: 0; /* Remove margin for compact layout */
+    }
+    #task_label {
+        margin-bottom: 20px; /* Adjust spacing below task label */
+    }
+    .task_done, .task_delete {
+        width: 100%; /* Make buttons full width */
+    }
+    button, button:hover {
+        font-size: 0.8em; /* Smaller font size on buttons */
+        border-color: #fff;
+    }
+    .focusFlow_task_list {
+        flex-direction: column; /* Stack task list vertically */
+    }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+/* Global body styling */
+body {
+    background-color: #f0f0f0; /* Light grey background */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Style for the Add Task button */
+#focusFlow_task_add_button {
+    background-color: #333;  /* Dark background */
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 5px;
+    padding: 5px;
+    width: 100%;
+}
+
+/* Header and task styling */
+head {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;  /* Dark header */
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.tasks {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2px; /* Spacing between tasks */
+    border: 8px solid #1a1a1a; /* Task border */
+    text-align: center;
+    padding: 10px;
+    width: 188px;
+    height: 320px;
+}
+
+#task_label {
+    font-size: 1.7em;
+    margin-bottom: auto;
+}
+
+#focusFlow_task_list {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   flex-wrap: nowrap;
+   overflow-x: auto;
+}
+
+/* Button styling for task actions */
+.task_done, .task_delete, .task_edit {
+    background-color: #333;
+    border: solid black;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 5px;
+    padding: 5px;
+    width: 50%;
+}
+
+/* Styling for the task description area */
+.description {
+    background-color: gray;
+    color: black;
+    width: 85%;
+    height: 25%;
+    border: 4px solid #333;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Styling for dialog inputs */
+#new_task_form, #edit_task_form {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 240px;
+    min-height: 375px;
+}
+
+#input_dialog textarea,
+#input_dialog input,
+#edit_tasks textarea,
+#edit_tasks input {
+    margin-bottom: 12px;
+}
+
+#input_dialog textarea,
+#edit_tasks textarea {
+    width: 97%;
+    height: 195px;
+    resize: vertical;
+}
+
+#new_task_dialog_label,
+#edit_task_dialog_label {
+    text-align: center;
+    font-size: larger;
+    text-decoration: underline;
+    margin-bottom: 12px;
+}

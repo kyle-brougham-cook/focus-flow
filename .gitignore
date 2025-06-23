@@ -4,10 +4,11 @@ __pycache__/
 .env/
 .mypy_cache/
 
+
 # Virtual env
 venv/
 .env
-
+.venv
 # Flask instance folder
 instance/
 

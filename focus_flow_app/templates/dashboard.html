@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - FocusFlow{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <header>
+
+            <h1>Dashboard</h1>
+
+            <h3 id="amount_of_tasks"></h3>
+        </header>
+
+        <button id="focusFlow_task_add_button" type="button">Add Task</button>
+
+        <div id="focusFlow_task_list">
+            <!-- Task items will be inserted here dynamically -->
+        </div>
+
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/logic.js')}}"></script>
+{% endblock %}

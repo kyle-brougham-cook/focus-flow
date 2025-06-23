@@ -105,7 +105,7 @@ def collect_files(base_dir='.'):
                 continue
             filtered_dirs.append(d)
         dirs[:] = filtered_dirs
-        
+
         for file in files:
             full_path = os.path.join(root, file)
             # Skip if any part of the path contains ignored dir
@@ -445,7 +445,7 @@ class Task(db.Model):
 
     name = Column(String(200), nullable=False)
     description = Column(String(350), nullable=True)
-    done = Column(Boolean, default=False, nullable=False) 
+    done = Column(Boolean, default=False, nullable=False)
 
     date = Column(
         DateTime,
@@ -453,7 +453,7 @@ class Task(db.Model):
         onupdate=datetime.now,
         nullable=False
     )
-    
+
     user = relationship('User', back_populates='tasks')
 
 
@@ -534,11 +534,11 @@ def create_New_User_Account():
         expected_keys = ["user_email", "user_name", "user_password"]
         form_data = form.to_dict()
 
-        
+
         if not all(key in form_data for key in expected_keys):
             flash("ERROR: INVALID KEY_PAIR RECEIVED! CONTACT AN ADMIN ASAP!")
             return redirect(url_for("auth.login_page")), 422
-        
+
         if not all(form_data[key].strip() for key in expected_keys):
             flash("ERROR: NO VALUES IN FORM_DATA! CONTACT AN ADMIN ASAP!")
             return redirect(url_for("auth.login_page")), 422
@@ -554,7 +554,7 @@ def create_New_User_Account():
             if user.email == form.get("user_email").strip(): # type: ignore
                 flash("A User with that Email already exists! Please try again.")
                 return redirect(url_for('auth.create_New_User_Account'))
-            
+
             else:
                 flash("A User with that name already exists! Please try again.")
                 return redirect(url_for('auth.create_New_User_Account'))
@@ -578,7 +578,7 @@ def login_page():
     ''' Our login route needs the email and password of the user'''
     if request.method == "GET":
         return render_template("login.html")
-    
+
     form = request.form
     user = db.session.execute(select(User).where(User.email == form.get("user_email"))).scalar_one_or_none()
     if user != None:
@@ -646,7 +646,7 @@ def get_tasks():
     task_list = []
     for task in tasks:
         if validator(task):
-            
+
             # Serialize each task into a dictionary.
             task_list.append({
                 "id": task.id,
@@ -668,18 +668,18 @@ def validator_json(data: dict) -> bool:
     # Check all keys are present
     if not all(key in data for key in required_keys):
         return False
-    
+
     # Check all keys values are of the correct datatype
     if not isinstance(data["name"], str) or not isinstance(data["description"], str):
         return False
-    
+
     return True
 
 
 
 def validator(task: Task) -> bool:
     '''This function validates our task data ensuring no data is missing before sending a task to the front-end
-    
+
     Args:
         iShort (Bool) : this is for when we only need the name, descripiton and id of a task.
 
@@ -715,13 +715,13 @@ def validator(task: Task) -> bool:
         else:
             continue
 
-    
+
     # This part checks against the expectedDict to ensure we are getting the expected datatypes...
     for keyIdx, value in expectedDict.items():
         if not isinstance(elList[keyIdx], value):
             print(elList[keyIdx], "\n", value)
             return False
-        
+
     return True
 
 
@@ -761,12 +761,12 @@ def add_tasks():
 
         if not request.is_json:
             return jsonify({"error": "data must be JSON"}), 400
-        
+
         data = request.get_json()
         missing = [k for k in exp_keys if k not in data]
         if missing:
             return jsonify({"error": f"missing keys: {missing}"}), 400
-        
+
 
         # check for missing data
         if not isinstance(data["name"], str) \
@@ -787,7 +787,7 @@ def add_tasks():
         task.description = data['description']
         db.session.commit()
         return jsonify({"message": "Task updated!"}), 200
-    
+
 
 @task_bp.route("/delete/<int:id>", methods=["DELETE"])
 @login_required
@@ -831,7 +831,7 @@ def completed_tasks(id):
     task = current_user.tasks.filter(Task.id == id).first()
     if not task:
         return jsonify({"error": f"The Task with the ID: {id} doesnt exist!"}), 404
-    
+
     if 'bool' in data and isinstance(data["bool"], bool):
         task.done = data["bool"]
         db.session.commit()
@@ -839,11 +839,11 @@ def completed_tasks(id):
         return jsonify({"message": f"Task done set as {data['bool']}!"}), 200
     else:
         return jsonify({"error": f'data doesnt have the correct key-value pair (bool:true|false) instead it has {data}'}), 400
-       
 
 
 
-    
+
+
 
 ===== .\focus_flow_app\routes\__init__.py =====
 from .auth_routes import auth_bp
@@ -1037,7 +1037,7 @@ buttonsArray.forEach(element => {
             window.location.href ='/auth/signup';
         };
     })
-    
+
 });
 ===== .\focus_flow_app\static\js\logic.js =====
 /**********************************************************************
@@ -1163,13 +1163,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch(form.action, {
             method: method, // Use configured HTTP method.
-            body: JSON.stringify(data), 
+            body: JSON.stringify(data),
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             }
         })
-        .then(response => response.json()) 
+        .then(response => response.json())
         .then(data => {
             console.log(data);
         })
@@ -1211,7 +1211,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Sets appropriate event listeners and adjusts styling.
      */
     const switchBtn = (elbutton, value) => {
-        
+
         const onFalseClick = () => {
             const val = {'bool': false};
             elbutton.parentElement.style.textDecoration = '';
@@ -1233,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elbutton.removeEventListener('click', onTrueClick);
             elbutton.addEventListener('click', onFalseClick);
         };
-        
+
         if (value == false) {
             elbutton.addEventListener('click', onFalseClick);
         } else if (value == true) {
@@ -1310,13 +1310,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let tasks = document.getElementsByClassName('tasks'); // Get current task elements.
         let amount = tasks.length;
         let amount_done = 0;
-  
+
         for (let task of tasks) {
             if (task.style.textDecoration === 'line-through') {
                 amount_done++;
             }
         }
-        task_counter.textContent = `${amount}/${amount_done}`; 
+        task_counter.textContent = `${amount}/${amount_done}`;
     };
 
     /**
@@ -1345,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', () => {
             done_task_buttons(document.getElementsByClassName('task_done'));
             edit_task_buttons(document.getElementsByClassName('task_edit'));
             task_amount(); // Update task counter.
- 
+
         } else {
             task.id = `task_${taskList && taskList.length ? taskList.length : 0}`;
             task.setAttribute('dbId', await get_amount_of_db_tasks())
@@ -1373,13 +1373,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const task_name_dialog = () => {
         let diag_box = document.createElement('dialog'); // Create dialog for user input.
         diag_box.id = 'input_dialog';
-        
+
         let makeTaskForm = document.createElement('form');
         makeTaskForm.action = `${domain}/task/tasks`;
         makeTaskForm.id = 'new_task_form';
         makeTaskForm.method = 'POST';
         // Ensure the backend can handle both adding and editing tasks.
-        
+
         let diag_box_label = document.createElement('label');
         diag_box_label.id = "new_task_dialog_label";
         diag_box_label.textContent = 'Add New Task';
@@ -1391,7 +1391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         label.textContent = 'Task Name';
         label.htmlFor = 'task_name_input_field';
         makeTaskForm.appendChild(label);
- 
+
         let input = document.createElement('input');
         input.type = 'text';
         input.placeholder = 'Enter task name';
@@ -1399,13 +1399,13 @@ document.addEventListener('DOMContentLoaded', () => {
         input.name = 'name';
         input.required = true;
         makeTaskForm.appendChild(input);
- 
+
         // Create label and textarea for the task description.
         let discLabel = document.createElement('label');
         discLabel.textContent = 'Task description';
         discLabel.htmlFor = 'description';
         makeTaskForm.appendChild(discLabel);
- 
+
         let discInput = document.createElement('textarea');
         discInput.placeholder = "Enter your task description...";
         discInput.id = 'description';
@@ -1419,7 +1419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.id = 'submitBtn';
         submitButton.type = 'submit';
         makeTaskForm.appendChild(submitButton);
-        
+
         // Create cancel button.
         let cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
@@ -1438,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         makeTaskForm.addEventListener('submit', (event) => {
             event.preventDefault();
             event.stopPropagation();
-            
+
             send_tasks(makeTaskForm);
             make_task_gui(input.value, null, discInput.value);
             // Close dialog after processing the form.
@@ -1497,7 +1497,7 @@ document.addEventListener('DOMContentLoaded', () => {
         task_decription_field_label.textContent = 'Task Description';
         task_decription_field_label.htmlFor = 'new_task_paragraph_field';
         editTaskForm.appendChild(task_decription_field_label);
-        
+
         const task_paragraph_field = document.createElement('textarea');
         task_paragraph_field.name = 'description';
         task_paragraph_field.required = true;
@@ -1560,8 +1560,8 @@ document.addEventListener('DOMContentLoaded', () => {
 ===== .\focus_flow_app\static\js\loginJSLogic.js =====
 /**
  * loginJSLogic.js
- * 
- * 
+ *
+ *
  * This file at the current time is used to clear flash messages from
  * login_page after 5000 miliseconds(5 seconds)...
  */
@@ -1618,7 +1618,7 @@ setTimeout(() => {
         <header>
 
             <h1>Dashboard</h1>
-          
+
             <h3 id="amount_of_tasks"></h3>
         </header>
 
@@ -1627,7 +1627,7 @@ setTimeout(() => {
         <div id="focusFlow_task_list">
             <!-- Task items will be inserted here dynamically -->
         </div>
-        
+
     </div>
 {% endblock %}
 {% block scripts %}
@@ -1706,7 +1706,7 @@ setTimeout(() => {
     </form>
 
 {% endblock %}
-        
+
 ===== .\tests\server__test.py =====
 import unittest
 from focus_flow_app import create_app
@@ -1720,7 +1720,7 @@ class FlaskServerTest(unittest.TestCase):
     def setUp(self):
         '''setUp this module runs before every test is executed'''
         self.app = create_app("testing") # type: ignore
-      
+
         # Initalise the test client from our Flask App...
         self.client = self.app.test_client()
         # Push the app context, in otherwords ensure the app is the current one being pointed to...
@@ -1759,7 +1759,7 @@ class FlaskServerTest(unittest.TestCase):
         db.session.add(test_task)
         db.session.commit()
         return test_task
-    
+
 
     def test_Root_Address(self):
         '''This is a unit test for checking our root address "/" is accessible via GET'''
@@ -1771,7 +1771,7 @@ class FlaskServerTest(unittest.TestCase):
         '''This unit test checks that our dashboard is loaded correctly'''
         response = self.client.get('/task/dashboard')
         self.assertEqual(response.status_code, 200, '"/dashboard.html" failed to load correctly!')
-          
+
 
     def test_Add_Task_To_Database(self):
         '''This unit test is used to check that we can add tests to our database via POST'''
@@ -1784,7 +1784,7 @@ class FlaskServerTest(unittest.TestCase):
         response = self.client.post('/task/tasks', data={'name': 'test_name', 'description': 'test_description'})
         self.assertEqual(response.status_code, 400, 'the error logic for checking if the response contains json in add_tasks() failed')
 
-    
+
     def test_Add_Task_To_Database_Invalid_Input_Missing(self):
         '''This unit test runs if the required data isnt given'''
         response = self.client.post('/task/tasks', json={'name': True, 'description': False})
@@ -1813,7 +1813,7 @@ class FlaskServerTest(unittest.TestCase):
     def test_Delete_Task(self):
         '''This unit test checks that we can correctly delete tasks from the database via their ID'''
         test_task = self.create_test_task()
-        
+
         stmt = select(Task).where(Task.name == test_task.name)
         result = db.session.execute(stmt).scalar_one_or_none()
 
@@ -1845,7 +1845,7 @@ class FlaskServerTest(unittest.TestCase):
         response = self.client.get('/task/getTasksLength/')
         self.assertEqual(response.status_code, 200, 'failed to get the amount of Task entries for the current user!')
 
-    
+
     def test_Amount_Of_Tasks_Fail(self):
         '''This unit test ensures we get notified if our Task table has no entries under the current user'''
         response = self.client.get('/task/getTasksLength/')
@@ -1891,7 +1891,7 @@ class FlaskServerTest(unittest.TestCase):
         response = self.client.post("/auth/signup", data={"user_name": "", "user_email": "", "user_password": ""})
         self.assertEqual(response.status_code, 422, "An empty key-pair isnt being reported when creating a new account!")
 
-    
+
     def test_Create_User_valid(self):
         '''This unit test ensures our create user route is correctly
         executing when its being given the correct data'''

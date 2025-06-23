@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Login - FocusFlow{% endblock %}
+{% block content %}
+    <h2>Login Page</h2>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul id="notification">
+        {% for m in messages %}
+        <li style="color: red; font-weight: bold; text-shadow: 1px 1px gray; border: solid 2px black; padding: 8px; background-color: #fff0f0;">{{m}}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('auth.login_page') }}" method="post">
+        <label for="userEmail">Enter Your Email</label>
+        <input id="userEmail" type="email" name="user_email" autocomplete="off" required />
+
+        <label for="userPassword">Enter Your Password</label>
+        <input id="userPassword" type="password" name="user_password" autocomplete="off" required />
+        <p id="newAccountSpan">
+            havent got an account?
+            <a id="newAccountLink" href="{{ url_for('auth.create_New_User_Account') }}">sign up</a>
+        </p>
+        <button type="submit">submit</button>
+    </form>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/loginJSLogic.js') }}"></script>
+{% endblock %}

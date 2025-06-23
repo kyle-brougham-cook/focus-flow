@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}FocusFlow{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mainPage.css')}}">
+{% endblock %}
+{% block content %}
+    <h1>Your One Stop Task Managment Website</h1>
+    <button class='button' id="login">Login</button><button class='button' id="signup">Sign Up</button>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/homeJSLogic.js')}}"></script>
+{% endblock %}
