@@ -1,5 +1,7 @@
 # 🧠 FocusFlow Task Manager
 
+![CI Pipeline](https://github.com/yourusername/focus-flow/actions/workflows/ci.yml/badge.svg)
+
 A full-stack Flask app with a secure backend and a custom-built JavaScript frontend for managing tasks between users. Supports HTTPS (via mkcert), user auth, CRUD, and clean API design.
 
 ---
