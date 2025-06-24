@@ -40,4 +40,4 @@ jobs:
         env:
           FLASK_CONFIG: testing
         run: |
-          python -m unittest discover tests
+          python -m unittest discover tests -p '*test*.py'
