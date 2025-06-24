@@ -2,6 +2,7 @@ name: CI Pipeline
 
 # 1) When to run
 on:
+  workflow_dispatch:
   push:
     branches: [main, mvp-flask]
   pull_request:
