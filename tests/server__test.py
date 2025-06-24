@@ -101,12 +101,7 @@ class FlaskServerTest(unittest.TestCase):
         self.create_test_task()
         response = self.client.patch(
             "/task/tasks",
-            json={
-                "task_name": "test_name",
-                "task_description": "test_description",
-                "id": 1,
-                "user_id": self.current_user_id,
-            },
+            json={"name": "test_name", "description": "test_description", "id": 1},
         )
         self.assertEqual(
             response.status_code,
@@ -129,12 +124,7 @@ class FlaskServerTest(unittest.TestCase):
         """This unit test checks if the send_tasks() function is passing all the required data"""
         response = self.client.patch(
             "/task/tasks",
-            json={
-                "task_name": "test_name",
-                "task_description": "test_description",
-                "id": "1",
-                "user_id": self.current_user_id,
-            },
+            json={"name": "test_name", "description": "test_description", "id": 1},
         )
         self.assertEqual(
             response.status_code, 400, "invalid! Missing Data from client!"
