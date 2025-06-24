@@ -10,8 +10,7 @@ from flask import (
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import select
-from ..models import User
-from .. import db
+from ..models import User, db
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
