@@ -1,4 +1,4 @@
-from focus_flow_app import create_app
+from focus_flow_app.__init__app import create_app
 from dotenv import load_dotenv
 import os
 

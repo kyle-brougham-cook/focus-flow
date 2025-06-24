@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 .env/
 .mypy_cache/
-
+__init__.py
 
 # Virtual env
 venv/
@@ -37,3 +37,7 @@ to-do.txt
 .env
 *.pem
 *.key
+
+# misc
+dump_clean_code.py
+CLEAN_project_dump.txt

@@ -1,4 +1,4 @@
-from focus_flow_app import db
+from focus_flow_app.__init__app import db
 from flask_login import UserMixin
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey

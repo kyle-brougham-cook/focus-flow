@@ -1,5 +1,5 @@
 import unittest
-from focus_flow_app import create_app
+from focus_flow_app.__init__app import create_app
 from sqlalchemy import select
 from focus_flow_app.models import Task, db
 
