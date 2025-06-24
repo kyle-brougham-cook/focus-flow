@@ -32,7 +32,7 @@ def create_app(config_name: str | None = None):
 
     CORS(app, supports_credentials=True, origins=app.config["CORS_ORIGINS"])
 
-    from .routes import register_routes
+    from .routes.__init__routes import register_routes
 
     register_routes(app)
 
