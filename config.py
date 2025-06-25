@@ -25,9 +25,7 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "")
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "postgresql+psycopg2://kyle:testpassword@localhost/myflaskdb"
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "")
 
 
 class TestingConfig(Config):
