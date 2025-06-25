@@ -40,5 +40,6 @@ jobs:
       - name: Run unit tests
         env:
           FLASK_CONFIG: testing
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           python -m unittest discover tests -p '*test*.py'
