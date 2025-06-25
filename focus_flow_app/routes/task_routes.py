@@ -145,7 +145,7 @@ def add_tasks():
         exp_keys = ["name", "description", "id"]
 
         if not request.is_json:
-            return jsonify({"error": "data must be JSON"}), 400
+            return jsonify({"error": "data must be JSON"}), 415
 
         data = request.get_json()
         missing = [k for k in exp_keys if k not in data]
@@ -158,7 +158,7 @@ def add_tasks():
             or not isinstance(data["description"], str)
             or not isinstance(data["id"], int)
         ):
-            return jsonify({"error": f"wrong data types - {data}"}), 400
+            return jsonify({"error": f"wrong data types - {data}"}), 422
 
         # Grabbing the task if it exists
         tid = data["id"]

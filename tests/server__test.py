@@ -116,18 +116,44 @@ class FlaskServerTest(unittest.TestCase):
         )
         self.assertEqual(
             response.status_code,
-            400,
+            415,
             "the error logic inside of the PATCH branch of add_tasks() that checks if the data is in has failed",
         )
 
     def test_Edit_Task_In_Database_Missing_Data(self):
         """This unit test checks if the send_tasks() function is passing all the required data"""
+        self.create_test_task()
         response = self.client.patch(
             "/task/tasks",
-            json={"name": "test_name", "description": "test_description", "id": 1},
+            json={"name": "test_name", "description": "test_description"},
         )
         self.assertEqual(
             response.status_code, 400, "invalid! Missing Data from client!"
+        )
+
+    def test_Edit_Task_In_Database_Wrong_Data_Types(self):
+        """This unit test checks if the data being passed to the server is of the correct types"""
+        self.create_test_task()
+        response = self.client.patch(
+            "/task/tasks",
+            json={"name": 9, "description": 8, "id": "me"},
+        )
+        self.assertEqual(
+            response.status_code,
+            422,
+            "incorrect Data Type's are not being caught on the patch request for editing tasks!",
+        )
+
+    def test_Edit_Task_In_Database_No_Task(self):
+        """This unit test ensures we dont attempt to edit a task where one does not exist"""
+        response = self.client.patch(
+            "/task/tasks",
+            json={"name": "testName", "description": "testDescription", "id": 1},
+        )
+        self.assertEqual(
+            response.status_code,
+            404,
+            "we are no longer catching when there is no task in the editing process!",
         )
 
     def test_Delete_Task(self):
