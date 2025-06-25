@@ -6,7 +6,7 @@ import os
 load_dotenv(".env")
 
 
-cfg = os.getenv("FLASK_CONFIG", "development").lower()
+cfg = os.getenv("FLASK_CONFIG", "production").lower()
 app = create_app(cfg)
 
 print("DB URI →", app.config["SQLALCHEMY_DATABASE_URI"])
