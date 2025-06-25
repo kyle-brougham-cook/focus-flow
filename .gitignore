@@ -24,7 +24,7 @@ instance/
 *.DB
 *.db
 *.db-journal
-/migrations
+
 
 # Certs
 awa.com-key.pem
