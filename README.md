@@ -20,24 +20,25 @@ Whether you're managing your own to-dos or showcasing a full-stack build to clie
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Screenshots](#-screenshots)
-- [Setup Guide](#-setup-guide)
+- [Getting Started](#-getting-started)
   - [Local Development](#-local-development)
-  - [Config Modes Overview](#-config-modes-overview)
+  - [Config Modes Overview](#%EF%B8%8F-config-modes-overview)
   - [Deploying to Render](#-deploying-to-render)
   - [Running Unit Tests](#-running-unit-tests)
 - [Example .env](#-example-env)
-- [License](#license)
+- [License](#-license)
 
 ---
 
 ## ✨ Features
-- 🔐 Secure session-based login with hashed passwords  
-- 📋 Create, update, and delete tasks seamlessly (no page reloads)  
-- 🚦 HTTPS + CORS out‑of‑the‑box for secure dev  
-- 🧪 Fully tested backend API endpoints  
-- 🔄 CI/CD ready with GitHub Actions  
-- 🧹 Pre-commit hooks using Black and Flake8  
-- 📦 Configurable via `.env` for easy deployment  
+
+- 🔐 Secure session-based login with hashed passwords
+- 📋 Create, update, and delete tasks seamlessly (no page reloads)
+- 🚦 HTTPS + CORS out‑of‑the‑box for secure dev
+- 🧪 Fully tested backend API endpoints
+- 🔄 CI/CD ready with GitHub Actions
+- 🧹 Pre-commit hooks using Black and Flake8
+- 📦 Configurable via `.env` for easy deployment
 
 ---
 
@@ -60,13 +61,14 @@ Whether you're managing your own to-dos or showcasing a full-stack build to clie
 
 ---
 
-## 🚀 Setup Guide
+## 🚀 Getting Started
 
 ### 🏠 Local Development
 
 This app supports flexible environment configs via `.env` and `FLASK_CONFIG`.
 
 You can use:
+
 - SQLite for local development (`DEV_DATABASE_URL`)
 - PostgreSQL locally by setting `DATABASE_URL`
 - A `.env` file to control both setup and behavior
@@ -109,11 +111,11 @@ python run.py
 
 The app uses `FLASK_CONFIG` to select between:
 
-| Mode         | FLASK_CONFIG       | DB Source             | Notes                      |
-|--------------|--------------------|------------------------|----------------------------|
-| Development  | `development`      | `DEV_DATABASE_URL`     | Defaults to local SQLite   |
-| Production   | `production`       | `DATABASE_URL`         | Use PostgreSQL in prod     |
-| Testing      | `testing`          | In-memory SQLite       | Used for unit tests        |
+| Mode        | FLASK_CONFIG  | DB Source          | Notes                    |
+| ----------- | ------------- | ------------------ | ------------------------ |
+| Development | `development` | `DEV_DATABASE_URL` | Defaults to local SQLite |
+| Production  | `production`  | `DATABASE_URL`     | Use PostgreSQL in prod   |
+| Testing     | `testing`     | In-memory SQLite   | Used for unit tests      |
 
 You can override any of these by setting different values in `.env`.
 
@@ -149,7 +151,6 @@ This ensures your PostgreSQL schema is auto-created on deploy.
 
 ---
 
-
 ### 🧪 Running Unit Tests
 
 This app supports testing via Python’s built-in `unittest`.
@@ -177,13 +178,6 @@ SSL_KEY=localhost-key.pem
 CORS_ORIGINS=https://localhost:5000
 FLASK_APP=run.py
 ```
-```
-
----
-
-## 📸 Screenshot
-
-_Coming soon: a visual preview of the app in action._
 
 ---
 
@@ -194,4 +188,9 @@ Built by **Kyle Brougham-Cook**
 📬 Open to freelance work, contracts, backend, or remote full-stack roles.
 
 ---
-```
+
+## 📄 License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to use, fork, and adapt it as needed.
+
+---
