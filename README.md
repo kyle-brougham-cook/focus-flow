@@ -57,9 +57,13 @@ Whether you're managing your own to-dos or showcasing a full-stack build to clie
 
 ## 📸 Screenshots
 
+### 🔐 Sign Up Page
+
+<img src="./screenshots/signup.png" width="600" alt="Sign up page screenshot" />
+
 ### 🔐 Login Page
 
-<img src="./screenshots/signup.png" width="600" alt="Login page screenshot" />
+<img src="./screenshots/signin.png" width="600" alt="Login page screenshot" />
 
 ### 📋 Task Dashboard
 
@@ -194,6 +198,12 @@ FLASK_APP=run.py
 Built by **Kyle Brougham-Cook**
 💻 [LinkedIn](https://linkedin.com/in/kyle-brougham-cook-718b672a4)
 📬 Open to freelance work, contracts, backend, or remote full-stack roles.
+
+---
+
+## ⚠️ Contribution Policy
+
+This project is part of my personal portfolio. While you're welcome to explore or fork it, **I’m not currently accepting external pull requests** so it can accurately reflect my individual work.
 
 ---
 
