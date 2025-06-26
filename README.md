@@ -1,161 +1,182 @@
 # 🧠 FocusFlow Task Manager
 
 [![CI Pipeline](https://github.com/kyle-brougham-cook/focus-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/kyle-brougham-cook/focus-flow/actions/workflows/ci.yml)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
 
-A full-stack Flask app with a secure backend and a custom-built JavaScript frontend for managing tasks between users. Supports HTTPS (via mkcert), user auth, CRUD, and clean API design.
+🌐 **Live Demo**: [https://focusflow-demo.onrender.com](https://focusflow-demo.onrender.com)
 
 ---
 
 ## Intro
 
-FocusFlow is a simple but secure task management app built from scratch with Flask and vanilla JS. Whether you’re managing your to-dos or learning how full-stack apps work, this project shows how to build clean APIs, session-based auth, and a custom frontend—all without using frameworks.
+FocusFlow is a full-stack task manager built with Flask and vanilla JS. It handles user authentication, secure session management, task CRUD, clean API architecture, and is set up for production deployment and CI/CD.
+
+Whether you're managing your own to-dos or showcasing a full-stack build to clients or employers, this project demonstrates how to build secure, scalable applications with a modern dev workflow.
+
+---
+
+## 📚 Table of Contents
+
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Screenshots](#-screenshots)
+- [Setup Guide](#-setup-guide)
+  - [Local Development](#-local-development)
+  - [Config Modes Overview](#-config-modes-overview)
+  - [Deploying to Render](#-deploying-to-render)
+  - [Running Unit Tests](#-running-unit-tests)
+- [Example .env](#-example-env)
+- [License](#license)
 
 ---
 
 ## ✨ Features
+- 🔐 Secure session-based login with hashed passwords  
+- 📋 Create, update, and delete tasks seamlessly (no page reloads)  
+- 🚦 HTTPS + CORS out‑of‑the‑box for secure dev  
+- 🧪 Fully tested backend API endpoints  
+- 🔄 CI/CD ready with GitHub Actions  
+- 🧹 Pre-commit hooks using Black and Flake8  
+- 📦 Configurable via `.env` for easy deployment  
 
-- 🔐 Secure user login with hashed passwords and session cookies
-- 📋 Add, edit, and delete tasks in real time (no page reloads)
-- 🌐 HTTPS and CORS setup for secure local dev
-- 🧪 Unit-tested API endpoints and validation
-- 🧼 Custom script to export clean code dumps for review
+---
+
+## 🧱 Tech Stack
+
+- **Backend**: Python, Flask, SQLAlchemy, Flask-Login
+- **Frontend**: Vanilla JavaScript, HTML5, CSS3
+- **Database**: PostgreSQL (prod), SQLite (local/test)
+- **Auth**: Session-based w/ secure cookies
+- **Deployment**: Render (Free Web Service)
+- **CI/CD**: GitHub Actions (w/ Pre-commit, Black, Flake8, unittest)
+- **Testing**: Python `unittest`
+- **Dev Tools**: `dotenv`, `mkcert`, `gunicorn`
 
 ---
 
 ## 📸 Screenshots
 
-Screenshots coming soon:
-
-- Login page
-- Task dashboard
-- Task creation modal
-- Mobile layout (if applicable)
-
----
-
-## 🛠️ Tech Stack
-
-- **Backend**: Flask, Flask-Login, Flask-Migrate, SQLAlchemy
-- **Database**: SQLite
-- **Frontend**: Vanilla JavaScript, HTML, CSS
-- **Auth**: Session-based with hashed passwords
-- **HTTPS**: mkcert-enabled with `.env` cert paths
-- **CORS**: Configurable via environment variable
-- **Testing**: Python `unittest`
+> _Coming soon: visual examples of the login screen, dashboard, and task modal._
 
 ---
 
 ## 🚀 Setup Guide
 
-### 0. Install dependencies
+### 🏠 Local Development
+
+This app supports flexible environment configs via `.env` and `FLASK_CONFIG`.
+
+You can use:
+- SQLite for local development (`DEV_DATABASE_URL`)
+- PostgreSQL locally by setting `DATABASE_URL`
+- A `.env` file to control both setup and behavior
 
 ```bash
+# 1. Clone the repo
+git clone https://github.com/kyle-brougham-cook/focus-flow.git
+cd focus-flow
+
+# 2. Create and activate a virtualenv
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
----
+# 4. Copy and configure environment variables
+cp .env.example .env
+# Edit `.env` to set:
+#   - FLASK_CONFIG=development
+#   - SECRET_KEY=your-local-key
+#   - DEV_DATABASE_URL=sqlite:///../instance/dev.db (or use DATABASE_URL for Postgres)
+#   - CORS_ORIGINS=https://localhost:5000
+#   - SSL_CERT & SSL_KEY if you're using mkcert
 
-### 1. Generate a secret key
-
-```bash
-python -c "import secrets; print(secrets.token_hex())"
-```
-
-Copy it into your `.env`:
-
-```env
-SECRET_KEY=your-generated-key
-```
-
----
-
-### 2. Create HTTPS certs (recommended)
-
-**Option A** – Quick localhost dev mode:
-
-```bash
-mkcert -install
+# 5. Generate local SSL certs (optional but recommended)
 mkcert localhost
-```
+# Add paths to .env
 
-Add to `.env`:
-
-```env
-SSL_CERT=localhost.pem
-SSL_KEY=localhost-key.pem
-DOMAIN=localhost
-```
-
-**Option B** – Custom local domain (optional advanced):
-
-1. Edit your `/etc/hosts` or `C:\Windows\System32\drivers\etc\hosts`:
-
-```
-127.0.0.1 awa.com
-```
-
-2. Run:
-
-```bash
-mkcert awa.com "*.awa.com" 127.0.0.1
-```
-
-3. Add to `.env`:
-
-```env
-DOMAIN=awa.com
-SSL_CERT=awa.com.pem
-SSL_KEY=awa.com-key.pem
-CORS_ORIGINS=https://awa.com:5000
-```
-
----
-
-### 3. CORS Config
-
-Set your expected frontend origin in `.env`:
-
-```env
-CORS_ORIGINS=https://localhost:5000
-```
-
----
-
-### 4. Database Migrations
-
-This app uses **Flask-Migrate** to manage database schema changes.
-
-#### 🛠 First-time DB Setup:
-
-```bash
-flask --app run.py db init
-flask --app run.py db migrate -m "initial"
+# 6. Run database migrations
 flask --app run.py db upgrade
-```
 
-#### 📈 After updating `models.py`:
-
-```bash
-flask --app run.py db migrate -m "updated schema"
-flask --app run.py db upgrade
-```
-
-You can commit your `migrations/` folder or let users generate it from models.
-
----
-
-### 5. Run it
-
-```bash
+# 7. Launch the dev server
 python run.py
 ```
 
 ---
 
-### 6. Testing
+### ⚙️ Config Modes Overview
+
+The app uses `FLASK_CONFIG` to select between:
+
+| Mode         | FLASK_CONFIG       | DB Source             | Notes                      |
+|--------------|--------------------|------------------------|----------------------------|
+| Development  | `development`      | `DEV_DATABASE_URL`     | Defaults to local SQLite   |
+| Production   | `production`       | `DATABASE_URL`         | Use PostgreSQL in prod     |
+| Testing      | `testing`          | In-memory SQLite       | Used for unit tests        |
+
+You can override any of these by setting different values in `.env`.
+
+---
+
+### 🌍 Deploying to Render
+
+Render automatically builds and deploys your app using:
+
+- `flask --app run.py db upgrade && gunicorn run:app`
+- `FLASK_CONFIG=production`
+
+#### Render Environment Variables to Set:
+
+```dotenv
+FLASK_CONFIG=production
+SECRET_KEY=your-production-key
+DATABASE_URL=your-postgresql-url
+CORS_ORIGINS=https://your-app.onrender.com
+```
+
+> ⚠️ Do NOT set `FLASK_APP`, `DOMAIN`, `PORT`, `SSL_CERT`, or `SSL_KEY` on Render—those are local-only.
+
+#### ⚠️ DB Migrations in Render (Free Tier)
+
+Since free Render plans don’t allow shell access, add this to your **Start Command** in Render's dashboard:
 
 ```bash
-python -m unittest
+flask --app run.py db upgrade && gunicorn run:app
+```
+
+This ensures your PostgreSQL schema is auto-created on deploy.
+
+---
+
+
+### 🧪 Running Unit Tests
+
+This app supports testing via Python’s built-in `unittest`.
+
+```bash
+# Use the testing config
+export FLASK_CONFIG=testing  # Windows: set FLASK_CONFIG=testing
+
+# Run the full test suite
+python -m unittest discover tests
+```
+
+---
+
+### ✅ Example `.env`
+
+```dotenv
+FLASK_CONFIG=development
+DEV_DATABASE_URL=sqlite:///../instance/dev.db
+SECRET_KEY=your-secret-key
+PORT=5000
+DOMAIN=localhost
+SSL_CERT=localhost.pem
+SSL_KEY=localhost-key.pem
+CORS_ORIGINS=https://localhost:5000
+FLASK_APP=run.py
+```
 ```
 
 ---
@@ -173,13 +194,4 @@ Built by **Kyle Brougham-Cook**
 📬 Open to freelance work, contracts, backend, or remote full-stack roles.
 
 ---
-
-## 🗂️ .env.example
-
-```env
-SECRET_KEY=your-secret-key-here
-DOMAIN=localhost
-SSL_CERT=localhost.pem
-SSL_KEY=localhost-key.pem
-CORS_ORIGINS=https://localhost:5000
 ```
