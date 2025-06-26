@@ -3,7 +3,7 @@
 [![CI Pipeline](https://github.com/kyle-brougham-cook/focus-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/kyle-brougham-cook/focus-flow/actions/workflows/ci.yml)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
 
-🌐 **Live Demo**: [https://focusflow-demo.onrender.com](https://focusflow-demo.onrender.com)
+🌐 **Live Demo**: [https://focusflow-demo.onrender.com](https://focus-flow-demo.onrender.com)
 
 ---
 
