@@ -57,9 +57,17 @@ Whether you're managing your own to-dos or showcasing a full-stack build to clie
 
 ## 📸 Screenshots
 
-> _Coming soon: visual examples of the login screen, dashboard, and task modal._
+### 🔐 Login Page
 
----
+<img src="./screenshots/signup.png" width="600" alt="Login page screenshot" />
+
+### 📋 Task Dashboard
+
+<img src="./screenshots/dashboard.png" width="600" alt="Dashboard screenshot with tasks listed" />
+
+### ➕ Add Task Modal
+
+## <img src="./screenshots/add_task_modal.png" width="600" alt="Add task modal with form inputs" />
 
 ## 🚀 Getting Started
 
