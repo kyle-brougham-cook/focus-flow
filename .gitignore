@@ -38,6 +38,11 @@ to-do.txt
 *.pem
 *.key
 
+# react stuff
+client/node_modules/
+client/dist/
+client/build/
+
 # misc
 dump_clean_code.py
 CLEAN_project_dump.txt
