@@ -1,21 +1,17 @@
 import os
-from datetime import timedelta
-
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "")
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=50)
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_SAMESITE = "None"
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 
 
 class DevelopmentConfig(Config):
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "")
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DEV_DATABASE_URL", "sqlite:///" + os.path.join(base_dir, "instance", "dev.db")

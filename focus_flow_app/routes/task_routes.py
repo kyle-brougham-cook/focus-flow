@@ -1,27 +1,38 @@
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request
 from datetime import datetime
-from flask_login import current_user, login_required
-from ..models import db, Task
-from sqlalchemy import select, desc
+from ..models import db, Task, User
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 
-task_bp = Blueprint("task", __name__, url_prefix="/task")
+task_bp = Blueprint("task", __name__)
 
 
-@task_bp.route("/dashboard/view", methods=["GET"])
-@login_required
-def view_dashboard():
-    return render_template("dashboard.html")
+def get_user():
+    """Get current user id from the token and return the corrosponding User model"""
+    user_id = get_jwt_identity()
+
+    if not user_id:
+        return False
+
+    current_user = User.query.get(int(user_id))
+
+    return current_user
 
 
 @task_bp.route("/dashboard", methods=["GET"])
-@login_required
+@jwt_required()
 def get_tasks():
     """
     Retrieve all tasks from the database,
     serialize them into JSON, and return.
     """
+
+    current_user = get_user()
+    if not current_user:
+        return jsonify({"Error": "No such user."}), 404
+
     tasks = current_user.tasks.all()
+
     task_list = []
     for task in tasks:
         if validator(task):
@@ -47,7 +58,7 @@ def get_tasks():
                 ),
                 500,
             )
-    return jsonify(task_list)
+    return jsonify(task_list), 200
 
 
 def validator_json(data: dict) -> bool:
@@ -81,13 +92,6 @@ def validator(task: Task) -> bool:
 
     expectedDict = {0: int, 1: str, 2: str, 3: bool, 4: datetime}
 
-    # This check is here incase we are dealing with the short version of this
-    # function where we only access the first 2/3 elements for validation...
-    if len(elList) < 3:
-        return False
-    elif len(elList) == 3:
-        return all(isinstance(item, (str, int)) for item in elList[:3])
-
     # This part checks that the regular validation logic of the function is expecting
     # the right amount of items to check against...
     for idx in expectedDict.keys():
@@ -107,58 +111,49 @@ def validator(task: Task) -> bool:
 
 
 @task_bp.route("/tasks", methods=["POST", "PATCH"])  # type: ignore
-@login_required
+@jwt_required()
 def add_tasks():
     """
     Add a new task or update an existing task in the database.
     Expects JSON data with task details.
     """
 
+    current_user = get_user()
+    if not current_user:
+        return jsonify({"error": "No such user."}), 404
+
     if request.method == "POST":
-        if request.is_json:
-            data = request.get_json()
-            if validator_json(data):
-                new_task = Task(
-                    name=data["name"],  # type: ignore
-                    description=data["description"],  # type: ignore
-                    user_id=current_user.id,  # type: ignore
-                )
-                db.session.add(new_task)
-                db.session.commit()
-                return jsonify({"message": "Task added!", "task_id": new_task.id}), 201
-            else:
-                return (
-                    jsonify(
-                        {"error": "the provided data did not include all required info"}
-                    ),
-                    422,
-                )
+        data = request.get_json()
+        if validator_json(data):
+            new_task = Task(
+                name=data["name"],  # type: ignore
+                description=data["description"],  # type: ignore
+                user_id=current_user.id,  # type: ignore
+            )
+            db.session.add(new_task)
+            db.session.commit()
+            return jsonify({"message": "Task added!", "task_id": new_task.id}), 201
         else:
-            return jsonify({"error": "there was no json in the response!"}), 400
+            return (
+                jsonify(
+                    {"error": "the provided data did not include all required info"}
+                ),
+                422,
+            )
 
     elif request.method == "PATCH":
         """
         Update task's name and description using PATCH.
         """
+
         # We use this list to check for the expected
         #  keys we are meant to recieve from the front-end
         exp_keys = ["name", "description", "id"]
-
-        if not request.is_json:
-            return jsonify({"error": "data must be JSON"}), 415
 
         data = request.get_json()
         missing = [k for k in exp_keys if k not in data]
         if missing:
             return jsonify({"error": f"missing keys: {missing}"}), 400
-
-        # check for missing data
-        if (
-            not isinstance(data["name"], str)
-            or not isinstance(data["description"], str)
-            or not isinstance(data["id"], int)
-        ):
-            return jsonify({"error": f"wrong data types - {data}"}), 422
 
         # Grabbing the task if it exists
         tid = data["id"]
@@ -176,14 +171,18 @@ def add_tasks():
         return jsonify({"message": "Task updated!"}), 200
 
 
-@task_bp.route("/delete/<int:id>", methods=["DELETE"])
-@login_required
-def delete_task(id):
+@task_bp.route("/delete/<int:taskId>", methods=["DELETE"])
+@jwt_required()
+def delete_task(taskId):
     """
     Delete the task with the specified ID.
     Returns an error if the task is not found.
     """
-    task = current_user.tasks.filter(Task.id == id).first()
+    current_user = get_user()
+    if not current_user:
+        return jsonify({"error": "No such user."}), 404
+
+    task = current_user.tasks.filter(Task.id == taskId).first()
     if task is None:
         return jsonify({"error": "Task not found!"}), 404
     db.session.delete(task)
@@ -191,38 +190,21 @@ def delete_task(id):
     return jsonify({"message": "Task deleted!"}), 200
 
 
-@task_bp.route("/getTasksLength/", methods=["GET"])  # type: ignore
-@login_required
-def amount_of_tasks():
-    latestTaskId = (
-        db.session.execute(
-            select(Task.id)
-            .where(Task.user_id == current_user.id)
-            .order_by(desc(Task.id))
-        )
-        .scalars()
-        .first()
-    )
-    print(latestTaskId)
-    if latestTaskId:
-        return jsonify({"amount": latestTaskId}), 200
-    else:
-        return (
-            jsonify({"error": "There are no Task entries under the current user"}),
-            404,
-        )
-
-
-@task_bp.route("/done/<int:id>", methods=["PATCH"])
-@login_required
-def completed_tasks(id):
+@task_bp.route("/done/", methods=["PATCH"])
+@jwt_required()
+def completed_tasks():
     """
     Mark the specified task as done or not done.
     """
+    current_user = get_user()
+    if not current_user:
+        return jsonify({"error": "No such user."}), 404
+
     if not request.is_json:
         return jsonify({"error": "invalid data, data needs to be inside json"}), 400
 
     data = request.get_json()
+    id = data["id"]
 
     # Update the 'done' attribute of the task.
     task = current_user.tasks.filter(Task.id == id).first()

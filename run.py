@@ -21,6 +21,7 @@ if __name__ == "__main__":
     ssl_key = os.getenv("SSL_KEY")
 
     app.run(
+        debug=True,
         host=domain,
         port=port,
         ssl_context=(ssl_cert, ssl_key) if ssl_cert and ssl_key else None,

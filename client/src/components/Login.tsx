@@ -1,0 +1,98 @@
+import { Link } from "react-router-dom";
+import AuthLayout from "./AuthLayout";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import ToastComponent from "./ToastNotification";
+import { useEffect, useState } from "react";
+
+const Login = () => {
+  let navigateFunc = useNavigate();
+  const { login } = useAuth();
+  const [isToastD, setIsToastD] = useState<boolean | null>(null);
+  const [toastLvl, setToastLvl] = useState<number>(0);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const fetchLogin = async (resp: string | boolean, navigate: any) => {
+    if (resp === true) {
+      navigate("/dashboard");
+    } else if (resp === "incorrect_password") {
+      setToastLvl(1);
+      setToastMsg("Incorrect Password.");
+      setIsToastD(true);
+    } else if (resp === "no_user") {
+      setToastLvl(2);
+      setToastMsg("There is no user with that email.");
+      setIsToastD(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!isToastD) return;
+    const timerId = window.setTimeout(() => setIsToastD(false), 5000);
+    return () => window.clearTimeout(timerId);
+  }, [isToastD]);
+
+  return (
+    <>
+      {isToastD && <ToastComponent msg={toastMsg} lvl={toastLvl} />}
+
+      <AuthLayout
+        title="Login"
+        children={
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const payload = {
+                email: (formData.get("email") as string) ?? "",
+                password: (formData.get("password") as string) ?? "",
+              };
+              fetchLogin(
+                await login(payload.email, payload.password),
+                navigateFunc
+              );
+            }}
+          >
+            <div className="flex flex-col gap-1 text-2xl text-[#8B5CF6]">
+              <label htmlFor="userEmail" className="">
+                Email
+              </label>
+              <input
+                id="userEmail"
+                name="email"
+                type="email"
+                className="px-4 py-2 w-full bg-white rounded-xl"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1 text-2xl text-[#8B5CF6]">
+              <label htmlFor="userPassword">Password</label>
+              <input
+                id="userPassword"
+                name="password"
+                type="password"
+                className="px-4 py-2 w-full bg-white rounded-xl"
+              />
+            </div>
+
+            <p className="mt-4 flex-col gap-1 text-md text-[#8B5CF6]">
+              Not already a user?{" "}
+              <Link to="/signup" className="hover:text-[#FC3AED]">
+                Sign Up
+              </Link>
+            </p>
+
+            <button
+              type="submit"
+              className="mt-6 mb-2 bg-[#8B5CF6] text-white py-2 px-4 rounded hover:bg-[#7C3AED]"
+            >
+              Login
+            </button>
+          </form>
+        }
+      />
+    </>
+  );
+};
+
+export default Login;

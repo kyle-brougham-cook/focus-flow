@@ -1,99 +1,114 @@
 from flask import (
     Blueprint,
     request,
-    render_template,
-    redirect,
-    flash,
-    url_for,
-    session,
+    jsonify,
+    make_response,
 )
-from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,
+)
 from sqlalchemy import select
 from ..models import User, db
 
 
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route("/signup", methods=["POST", "GET"])
+@auth_bp.route("/signup", methods=["POST"])  # type: ignore
 def create_New_User_Account():
     """Our signup route it requires an email, username and password"""
-    if request.method == "GET":
-        return render_template("signup.html")
-    else:
-        form = request.form
-        expected_keys = ["user_email", "user_name", "user_password"]
-        form_data = form.to_dict()
+    data = request.get_json()
+    expected_keys = ["email", "name", "password"]
 
-        if not all(key in form_data for key in expected_keys):
-            flash("ERROR: INVALID KEY_PAIR RECEIVED! CONTACT AN ADMIN ASAP!")
-            return redirect(url_for("auth.login_page")), 422
+    if not all(key in data for key in expected_keys):
+        return (
+            jsonify(
+                {"error": "ERROR: INVALID KEY_PAIR RECEIVED! CONTACT AN ADMIN ASAP!"}
+            ),
+            422,
+        )
 
-        if not all(form_data[key].strip() for key in expected_keys):
-            flash("ERROR: NO VALUES IN FORM_DATA! CONTACT AN ADMIN ASAP!")
-            return redirect(url_for("auth.login_page")), 422
+    if not all(data[key].strip() for key in expected_keys):
+        return (
+            jsonify({"error": "ERROR: NO VALUES IN FORM_DATA! CONTACT AN ADMIN ASAP!"}),
+            422,
+        )
 
-        user = db.session.execute(
-            select(User).where(
-                (User.email == form.get("user_email").strip())  # type: ignore
-                | (User.username == form.get("user_name").strip())  # type: ignore
+    user = db.session.execute(
+        select(User).where(
+            (User.email == data.get("email").strip())  # type: ignore
+            | (User.username == data.get("name").strip())  # type: ignore
+        )
+    ).scalar_one_or_none()
+
+    if user:
+        if user.email == data.get("email").strip():  # type: ignore
+            return jsonify(
+                {"error": "A User with that Email already exists! Please try again."}
             )
-        ).scalar_one_or_none()
 
-        if user:
-            if user.email == form.get("user_email").strip():  # type: ignore
-                flash("A User with that Email already exists! Please try again.")
-                return redirect(url_for("auth.create_New_User_Account"))
-
-            else:
-                flash("A User with that name already exists! Please try again.")
-                return redirect(url_for("auth.create_New_User_Account"))
         else:
-            new_user = User(
-                username=form.get("user_name").strip(),  # type: ignore
-                password=generate_password_hash(  # type: ignore
-                    form.get("user_password").strip()  # type: ignore
-                ),  # type: ignore
-                email=form.get("user_email").strip(),  # type: ignore
+            return jsonify(
+                {"error": "A User with that name already exists! Please try again."}
             )
+    else:
+        new_user = User(
+            username=data.get("name").strip(),  # type: ignore
+            password=generate_password_hash(  # type: ignore
+                data.get("password").strip()  # type: ignore
+            ),  # type: ignore
+            email=data.get("email").strip(),  # type: ignore
+        )
 
-            db.session.add(new_user)
-            db.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
 
-            login_user(new_user)
-            return redirect(url_for("task.view_dashboard"))
+        return jsonify({}), 200
 
 
-@auth_bp.route("/login_page", methods=["POST", "GET"])
+@auth_bp.route("/login", methods=["POST", "GET"])
 def login_page():
     """Our login route needs the email and password of the user"""
-    if request.method == "GET":
-        return render_template("login.html")
 
-    form = request.form
+    data = request.get_json()
     user = db.session.execute(
-        select(User).where(User.email == form.get("user_email"))
+        select(User).where(User.email == data.get("email"))  # type: ignore
     ).scalar_one_or_none()
     if user is not None:
         if not check_password_hash(
-            user.password, form.get("user_password").strip()  # type: ignore
+            user.password, data.get("password").strip()  # type: ignore
         ):  # type: ignore
-            flash("Incorrect password!")
-            return redirect(url_for("auth.login_page"), code=302)
+            return jsonify({"status": "wrong_password"})
         else:
-            login_user(user)
-            session.permanent = True
-            return redirect(url_for("task.view_dashboard"), code=302)
+            access_token = create_access_token(identity=str(user.id))
+            refresh_token = create_refresh_token(identity=str(user.id))
+
+            response = make_response(
+                jsonify({"access_token": access_token, "user_name": user.username})
+            )
+
+            response.set_cookie(
+                "refresh_token",
+                refresh_token,
+                httponly=True,
+                secure=False,
+                samesite="Lax",
+                max_age=30 * 24 * 60 * 60,
+            )
+
+            return response
     else:
-        flash(f"A user with the email: {form.get('user_email')} doesn't exist.")
-        return redirect(url_for("auth.login_page"), code=302)
+        return jsonify({"status": "no_user"})
 
 
-@auth_bp.route("/logout", methods=["POST"])
-@login_required
-def logout():
-    """Our logout route"""
-    flash(f"{current_user.username} was logged out.")
-    logout_user()
-    return redirect(url_for("auth.login_page"), code=303)
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def token_refresh():
+    """This is our JWT access token refresh route"""
+    current_user = get_jwt_identity()
+    new_access_token = create_access_token(identity=current_user)
+    return jsonify(access_token=new_access_token), 200

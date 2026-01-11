@@ -2,6 +2,7 @@ import unittest
 from focus_flow_app.__init__app import create_app
 from sqlalchemy import select
 from focus_flow_app.models import Task, db
+from flask_login import current_user
 
 
 class FlaskServerTest(unittest.TestCase):
@@ -18,22 +19,22 @@ class FlaskServerTest(unittest.TestCase):
         self.ctx.push()
         db.create_all()
 
-        resp = self.client.post(
-            "/auth/signup",
-            data={
-                "user_name": "testUser",
-                "user_email": "testUser@gmail.com",
-                "user_password": "testPassword",
-            },
-            follow_redirects=True,
-        )
+        with self.client:
 
-        with self.client.session_transaction() as sess:
-            id = int(sess["_user_id"])
+            resp = self.client.post(
+                "/api/auth/signup",
+                data={
+                    "name": "testUsertwo",
+                    "email": "testUsertwo@gmail.com",
+                    "password": "testPassword",
+                },
+                follow_redirects=True,
+            )
 
-        self.current_user_id = id
-
-        self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(b"success", resp.data)
+            self.assertTrue(current_user.is_authenticated)
+            self.current_user_id = current_user.id
 
     def tearDown(self):
         """tearDown this module runs after every test is excuted"""
@@ -50,45 +51,41 @@ class FlaskServerTest(unittest.TestCase):
         db.session.commit()
         return test_task
 
-    def test_Root_Address(self):
-        """This is a unit test for checking our root address "/" is accessible via GET"""
-        response = self.client.get("/")
-        self.assertEqual(
-            response.status_code, 200 or 304, 'root address "/" was not accessed.'
-        )
-
     def test_Give_Tasks(self):
         """This unit test checks that our dashboard is loaded correctly"""
-        response = self.client.get("/task/dashboard")
+        response = self.client.get("/api/task/dashboard")
         self.assertEqual(
-            response.status_code, 200, '"/dashboard.html" failed to load correctly!'
+            response.status_code,
+            200,
+            '"task/dashboard" failed to deliver tasks correctly!',
         )
 
     def test_Add_Task_To_Database(self):
         """This unit test is used to check that we can add tests to our database via POST"""
         response = self.client.post(
-            "/task/tasks",
-            json={"name": "test name", "description": "testdescription", "id": 0},
+            "/api/task/tasks",
+            data={"name": "test name", "description": "testdescription"},
         )
         self.assertEqual(
             response.status_code, 201, "the task failed to be added in add_tasks()"
         )
 
-    def test_Add_Task_To_Database_Invalid_Input_Not_Json(self):
-        """This unit test checks that the body part of the response for adding tasks contains json"""
+    def test_Add_Task_To_Database_Invalid_Input_Not_Data(self):
+        """This unit test checks that the body part of the response for before adding tasks that it is of the form type"""
         response = self.client.post(
-            "/task/tasks", data={"name": "test_name", "description": "test_description"}
+            "/api/task/tasks",
+            json={"name": "test_name", "description": "test_description"},
         )
         self.assertEqual(
             response.status_code,
-            400,
-            "the error logic for checking if the response contains json in add_tasks() failed",
+            422,
+            "the error logic for checking if the response contains a form in add_tasks() failed",
         )
 
     def test_Add_Task_To_Database_Invalid_Input_Missing(self):
         """This unit test runs if the required data isnt given"""
         response = self.client.post(
-            "/task/tasks", json={"name": True, "description": False}
+            "/api/task/tasks", json={"name": True, "description": False}
         )
         self.assertEqual(
             response.status_code,
@@ -100,8 +97,8 @@ class FlaskServerTest(unittest.TestCase):
         """This unit test checks that we can edit tasks by their id from the database using PATCH"""
         self.create_test_task()
         response = self.client.patch(
-            "/task/tasks",
-            json={"name": "test_name", "description": "test_description", "id": 1},
+            "/api/task/tasks",
+            data={"name": "test_name", "description": "test_description", "id": 1},
         )
         self.assertEqual(
             response.status_code,
@@ -109,46 +106,31 @@ class FlaskServerTest(unittest.TestCase):
             "the edit of the task within the PATCH call of add_tasks() has failed.",
         )
 
-    def test_Edit_Task_In_Database_Not_Json(self):
-        """This unit test ensures we are passing json in the body from send_tasks() else it fails"""
-        response = self.client.patch(
-            "/task/tasks", data={"not_json": "not json either"}
-        )
+    def test_Edit_Task_In_Database_Not_Form(self):
+        """This unit test ensures we are passing a from in the body from send_tasks() else it fails"""
+        response = self.client.patch("/api/task/tasks", json={"json": "also json"})
         self.assertEqual(
             response.status_code,
-            415,
-            "the error logic inside of the PATCH branch of add_tasks() that checks if the data is in has failed",
+            400,
+            "the error logic inside of the PATCH branch of add_tasks() that checks if the data passed is it is a form has failed",
         )
 
     def test_Edit_Task_In_Database_Missing_Data(self):
         """This unit test checks if the send_tasks() function is passing all the required data"""
         self.create_test_task()
         response = self.client.patch(
-            "/task/tasks",
+            "/api/task/tasks",
             json={"name": "test_name", "description": "test_description"},
         )
         self.assertEqual(
             response.status_code, 400, "invalid! Missing Data from client!"
         )
 
-    def test_Edit_Task_In_Database_Wrong_Data_Types(self):
-        """This unit test checks if the data being passed to the server is of the correct types"""
-        self.create_test_task()
-        response = self.client.patch(
-            "/task/tasks",
-            json={"name": 9, "description": 8, "id": "me"},
-        )
-        self.assertEqual(
-            response.status_code,
-            422,
-            "incorrect Data Type's are not being caught on the patch request for editing tasks!",
-        )
-
     def test_Edit_Task_In_Database_No_Task(self):
         """This unit test ensures we dont attempt to edit a task where one does not exist"""
         response = self.client.patch(
-            "/task/tasks",
-            json={"name": "testName", "description": "testDescription", "id": 1},
+            "/api/task/tasks",
+            data={"name": "testName", "description": "testDescription", "id": "1"},
         )
         self.assertEqual(
             response.status_code,
@@ -168,7 +150,7 @@ class FlaskServerTest(unittest.TestCase):
         else:
             task_id = None
 
-        response = self.client.delete(f"/task/delete/{task_id}")
+        response = self.client.delete("/api/task/delete/", json={"taskId": task_id})
         self.assertEqual(
             response.status_code,
             200,
@@ -182,7 +164,7 @@ class FlaskServerTest(unittest.TestCase):
 
     def test_Delete_Task_Bad_Id(self):
         """This unit test ensures when a Id for a task that doesnt exist is sent its caught"""
-        response = self.client.delete("/task/delete/00")
+        response = self.client.delete("/api/task/delete/00")
 
         isTask = db.session.execute(
             select(Task).where(Task.id == 00)
@@ -201,7 +183,7 @@ class FlaskServerTest(unittest.TestCase):
     def test_Amount_Of_Tasks(self):
         """This unit test gets the amount of Task entries we have in our database for our current user"""
         self.create_test_task()
-        response = self.client.get("/task/getTasksLength/")
+        response = self.client.get("/api/task/getTasksLength/")
         self.assertEqual(
             response.status_code,
             200,
@@ -210,7 +192,7 @@ class FlaskServerTest(unittest.TestCase):
 
     def test_Amount_Of_Tasks_Fail(self):
         """This unit test ensures we get notified if our Task table has no entries under the current user"""
-        response = self.client.get("/task/getTasksLength/")
+        response = self.client.get("/api/task/getTasksLength/")
         self.assertEqual(
             response.status_code,
             404,
@@ -220,35 +202,33 @@ class FlaskServerTest(unittest.TestCase):
     def test_Done_Tasks(self):
         """This unit test checks that the server is reciving the expect datatype ie JSON from done_tasks"""
         self.create_test_task()
-        response = self.client.patch("/task/done/1", json={"bool": True})
+        response = self.client.patch("/api/task/done/", json={"id": "1", "bool": True})
         self.assertEqual(
             response.status_code,
             200,
-            "The task with ID:1 was unable to be marked as done in the '/task/done' route!",
+            "The task with ID:1 was unable to be marked as done in the '/api/task/done' route!",
         )
 
     def test_Done_Tasks_Invalid_Data(self):
-        """This unit test ensures we get an error if the datatype isnt JSON from done_task"""
-        response = self.client.patch(
-            "/task/done/1", data={"invalid_key": "invalid_value"}
-        )
+        """This unit test ensures we get an error if the request type isnt JSON from frontend"""
+        response = self.client.patch("/api/task/done/", data={"id": "1"})
         self.assertEqual(
             response.status_code,
             400,
-            "The '/task/done' route is not correctly catching if the data sent to it isnt JOSN!",
+            "The '/api/task/done' route is not correctly catching if the data sent to it isnt JOSN!",
         )
 
     def test_Done_Tasks_No_Such_Task(self):
-        """This unit test gives us an error if done_tasks gives us an ID that isnt linked to a task"""
-        response = self.client.patch("/task/done/00", json={"bool": True})
+        """This unit test gives us an error if the frontend gives us an ID that isnt linked to a task"""
+        response = self.client.patch("/api/task/done/", json={"id": "00", "bool": True})
         self.assertEqual(
             response.status_code, 404, "invalid! no task with ID: 00 exists"
         )
 
     def test_Done_Tasks_Invalid_KeyPair(self):
-        """This unit test gives us an error if our server recivies an incorrect key-value pair from done_tasks"""
+        """This unit test gives us an error if our server recivies an incorrect key-value pair from the frontend"""
         self.create_test_task()
-        response = self.client.patch("/task/done/1", json={"bool": None})
+        response = self.client.patch("/api/task/done/", json={"id": "1", "bool": None})
         self.assertEqual(
             response.status_code,
             400,
@@ -259,7 +239,7 @@ class FlaskServerTest(unittest.TestCase):
         """This unit test ensures we are catching if an incorrect key_pair is being
         provided by our signup form."""
         response = self.client.post(
-            "/auth/signup",
+            "/api/auth/signup",
             data={
                 "name": "test_name",
                 "user_email": "test@email",
@@ -276,7 +256,7 @@ class FlaskServerTest(unittest.TestCase):
         """This unit test ensures we are catching if an empty key_pair is being
         provided by our signup form."""
         response = self.client.post(
-            "/auth/signup",
+            "/api/auth/signup",
             data={"user_name": "", "user_email": "", "user_password": ""},
         )
         self.assertEqual(
@@ -289,36 +269,36 @@ class FlaskServerTest(unittest.TestCase):
         """This unit test ensures our create user route is correctly
         executing when its being given the correct data"""
         response = self.client.post(
-            "/auth/signup",
+            "/api/auth/signup",
             data={
-                "user_name": "testName",
-                "user_email": "testEmail@gmail.com",
-                "user_password": "testUserPassword",
+                "name": "testName",
+                "email": "testEmail@gmail.com",
+                "password": "testUserPassword",
             },
         )
         self.assertEqual(
-            response.status_code, 302, "Our create user route failed on correct data!"
+            response.status_code, 200, "Our create user route failed on correct data!"
         )
 
     def test_Login_User_valid(self):
         """This unit test tests for the successful case of our user login"""
         response = self.client.post(
-            "/auth/login_page",
-            data={"user_email": "testUser@gmail.com", "user_password": "testPassword"},
+            "/api/auth/login",
+            data={"email": "testUsertwo@gmail.com", "password": "testPassword"},
             follow_redirects=True,
         )
         self.assertNotIn(
-            b"Incorrect password",
+            b"wrong_password",
             response.data,
             "The test user was not able to sign in as expected!",
         )
         self.assertNotIn(
-            b"A user with that email:",
+            b"no_user",
             response.data,
             "The test user was not able to sign in as expected!",
         )
         self.assertIn(
-            b"Dashboard",
+            b"login_success",
             response.data,
             "The test user was not able to sign in as expected!",
         )
@@ -326,15 +306,15 @@ class FlaskServerTest(unittest.TestCase):
     def test_Login_User_Invalid_Password(self):
         """This unit test tests for the unsuccessful case of our user login where the password does not match"""
         response = self.client.post(
-            "/auth/login_page",
+            "/api/auth/login",
             data={
-                "user_email": "testUser@gmail.com",
-                "user_password": "wrongtestPassword",
+                "email": "testUsertwo@gmail.com",
+                "password": "wrongtestPassword",
             },
             follow_redirects=True,
         )
         self.assertIn(
-            b"Incorrect password!",
+            b"wrong_password",
             response.data,
             "The test password was incorrect but not caught!",
         )
@@ -342,24 +322,24 @@ class FlaskServerTest(unittest.TestCase):
     def test_Login_User_Invalid_Email(self):
         """This unit test tests for the unsuccessful case of our user email not existing in the database"""
         response = self.client.post(
-            "/auth/login_page",
+            "/api/auth/login",
             data={
-                "user_email": "noneExistantTestUser@gmail.com",
-                "user_password": "testPassword",
+                "email": "noneExistantTestUser@gmail.com",
+                "password": "testPassword",
             },
             follow_redirects=True,
         )
         self.assertIn(
-            b"A user with the email:",
+            b"no_user",
             response.data,
             "The test email was not pressent in the database but didnt fail!",
         )
 
     def test_Logout_User_Valid(self):
         """This unit test ensures that our logout route is functioning as expected"""
-        response = self.client.post("/auth/logout")
+        response = self.client.post("/api/auth/logout")
         self.assertEqual(
-            response.status_code, 303, "The logout for the current user failed!"
+            response.status_code, 200, "The logout for the current user failed!"
         )
 
 
