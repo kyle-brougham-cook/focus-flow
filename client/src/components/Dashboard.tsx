@@ -13,9 +13,10 @@ const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isSettingsOpen, setIsSettinsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [taskId, setTaskId] = useState("");
   const { token } = useAuth();
-  const apiUrl = import.meta.env.VITE_API_URL;
+
 
   useEffect(() => {
     fetchTasks();
@@ -27,12 +28,14 @@ const Dashboard = () => {
   }, [token]);
 
   const fetchTasks = async () => {
-    if (!token) return;
-
-    const res = await api.get(`${apiUrl}/api/task/dashboard`);
+    setIsLoading(true);
+    
+    const res = await api.get('/task/dashboard');
 
     const tasksArray = (await res.data) as Task[];
     setTasks(tasksArray);
+
+    setIsLoading(false);
   };
 
   return (
@@ -78,8 +81,11 @@ const Dashboard = () => {
         >
           New Task
         </button>
-        <div className="grid grid-cols-2 gap-2 p-2 lg:grid-cols-5 md:grid-cols-3">
-          {tasks.map((task) => (
+        <div className="grid grid-cols-2 has-[#loading-p]:grid-cols-1 gap-2 p-2 lg:grid-cols-5 md:grid-cols-3">
+          {isLoading ? (
+            <p id="loading-p" className="justify-self-center self-start text-2xl font-bold text-violet-700 pl-1 pr-1 hover:">Loading tasks...</p>
+          ) : (
+            tasks.map((task) => (
             <TaskComponent
               key={task.id}
               task={task}
@@ -88,7 +94,9 @@ const Dashboard = () => {
               modelSetting={setIsUpdate}
               taskIdSetter={setTaskId}
             />
-          ))}
+          ))
+        )}
+
         </div>
       </div>
     </>

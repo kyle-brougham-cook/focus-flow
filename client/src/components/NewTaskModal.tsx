@@ -1,11 +1,10 @@
 import type React from "react";
 import { api } from "../api/axios";
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const sendNewTask = async (form: FormData) => {
   const payload = Object.fromEntries(form.entries());
 
-  const response = await api.post(`${apiUrl}/api/task/tasks`, payload);
+  const response = await api.post('/task/tasks', payload);
 
   if (response.data.error) {
     throw Error(`response was not okay: ${response.statusText}`);
@@ -18,7 +17,7 @@ const sendUpdatedTask = async (form: FormData, id: string) => {
 
   const payload = Object.fromEntries(form.entries());
 
-  const response = await api.patch(`${apiUrl}/api/task/tasks`, payload);
+  const response = await api.patch('/task/tasks', payload);
 
   if (response.data.error)
     throw new Error(

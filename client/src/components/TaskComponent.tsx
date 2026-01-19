@@ -1,7 +1,6 @@
 import { api } from "../api/axios";
 import type { Task } from "../types/task";
 
-const apiUrl = import.meta.env.VITE_API_URL;
 
 interface Props {
   task: Task;
@@ -12,7 +11,7 @@ interface Props {
 }
 
 const doneTask = async (id: string, bool: boolean) => {
-  const req = await api.patch(`${apiUrl}/api/task/done/`, {
+  const req = await api.patch('/task/done/', {
     id: id,
     bool: bool,
   });
@@ -26,7 +25,7 @@ const doneTask = async (id: string, bool: boolean) => {
 const deleteTask = async (id: string) => {
   const taskId = Number(id);
 
-  const req = await api.delete(`${apiUrl}/api/task/delete/${taskId}`);
+  const req = await api.delete(`/task/delete/${taskId}`);
 
   if (req.data.error)
     throw new Error(

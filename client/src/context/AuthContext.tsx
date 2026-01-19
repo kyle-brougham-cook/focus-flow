@@ -14,6 +14,7 @@ type user = string | null;
 interface AuthContextInterface {
   token: accessToken;
   user: user;
+  isLoading: boolean;
   isAuthenticated: boolean;
   login: (
     email: string,
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setAccessToken] = useState<accessToken>(null);
   const [user, setUser] = useState<user>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -42,11 +44,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    token && user ? setIsAuthenticated(true) : setIsAuthenticated(false);
-  }, [token, user]);
+    const hydrate = async () => {
+      try {
+        const res = await api.post("/auth/refresh");
+        setAccessToken(res.data.access_token);
+        setIsAuthenticated(true);
+      } catch {
+        setAccessToken(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    hydrate();
+  }, []);
 
   const login = async (userEmail: string, userPassword: string) => {
-    const response = await api.post("/api/auth/login", {
+    const response = await api.post("/auth/login", {
       email: userEmail,
       password: userPassword,
     });
@@ -61,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setAccessToken(response.data["access_token"]);
       setUser(response.data["user_name"]);
+      setIsAuthenticated(true);
 
       return true;
     }
@@ -88,6 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         token,
         isAuthenticated,
+        isLoading,
       }}
     >
       {children}

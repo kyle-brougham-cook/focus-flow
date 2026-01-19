@@ -1,8 +1,9 @@
 import axios from "axios";
-import { forceLogout } from "../auth/authHandler";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.PROD
+    ? import.meta.env.VITE_API_URL
+    : "/api",
   withCredentials: true,
 });
 
@@ -10,7 +11,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
-    if (token) {
+    if (token && !config.url?.includes("/auth/refresh")) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -30,13 +31,14 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/api/auth/refresh")
+      !originalRequest.url.includes("/auth/refresh") &&
+      localStorage.getItem("token")
     ) {
 
       originalRequest._retry = true;
 
       try {
-        const res = await api.post("/api/auth/refresh");
+        const res = await api.post("/auth/refresh");
         const newAccess = res.data.access_token;
         localStorage.setItem("token", newAccess);
 
@@ -44,8 +46,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        forceLogout();
-        console.error("Refresh failed: ", refreshError);
+        
         return Promise.reject(refreshError);
       }
     }

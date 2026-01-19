@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/axios";
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
 interface data {
   name: string;
   email: string;
@@ -20,10 +18,10 @@ const SignUp = () => {
   const [name, setName] = useState("");
 
   const signUpData = async (data: data) => {
-    const response = await api.post(`${apiUrl}/api/auth/signup`, data);
+    const response = await api.post('/auth/signup', data);
 
     if (response.data.error) {
-      throw new Error(`Server error: ${response.statusText}`);
+      throw new Error(`Server error: ${response.status}`);
     }
 
     await login(data.email, data.password);

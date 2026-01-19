@@ -4,6 +4,8 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
+    JWT_COOKIE_CSRF_PROTECT = False
+    JWT_TOKEN_LOCATION = ["headers", "cookies"]
     SECRET_KEY = os.environ.get("SECRET_KEY", "")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
