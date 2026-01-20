@@ -60,7 +60,7 @@ const TaskComponent = ({
           className="flex-1 border border-violet-600 text-violet-600 rounded hover:bg-violet-100 transition"
           onClick={async () => {
             await doneTask(task.id, task.done);
-            await refreshTasks();
+            refreshTasks();
           }}
         >
           Done
@@ -79,7 +79,7 @@ const TaskComponent = ({
           className="flex-1 border border-violet-600 text-violet-600 rounded hover:bg-violet-100 transition"
           onClick={async () => {
             await deleteTask(task.id);
-            await refreshTasks();
+            refreshTasks();
           }}
         >
           Delete

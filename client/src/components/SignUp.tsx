@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import AuthLayout from "./AuthLayout";
+import AuthLayoutBase from "./AuthLayoutBase";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/axios";
@@ -32,7 +32,7 @@ const SignUp = () => {
 
   return (
     <>
-      <AuthLayout
+      <AuthLayoutBase
         title="Sign Up"
         children={
           <form

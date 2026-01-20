@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-const AuthLayout = ({
+const AuthLayoutBase = ({
   title,
   children,
 }: {
@@ -21,4 +21,4 @@ const AuthLayout = ({
   </>
 );
 
-export default AuthLayout;
+export default AuthLayoutBase;

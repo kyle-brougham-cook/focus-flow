@@ -7,19 +7,13 @@ interface props {
 }
 
 const ProtectedRoute = ({ children }: props) => {
-  const { isAuthenticated, isLoading, token } = useAuth();
+  const { isAuthenticated, isLoading} = useAuth();
 
   if (isLoading) return null;
 
-  if (!isAuthenticated) {
-    console.log("REDIRECTING TO LOGIN", {
-      isAuthenticated,
-      token
-    });
-    return <Navigate to={"/login"} replace />
-  }
+  if (!isAuthenticated) return <Navigate to={"/login"} replace />;
 
-  return <>{children}</>
+  return <>{children}</>;
 }
 
 export default ProtectedRoute;

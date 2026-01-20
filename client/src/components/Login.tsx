@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
-import AuthLayout from "./AuthLayout";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AuthLayoutBase from "./AuthLayoutBase";
 import { useAuth } from "../context/AuthContext";
 import ToastComponent from "./ToastNotification";
 import { useEffect, useState } from "react";
@@ -8,35 +7,35 @@ import { useEffect, useState } from "react";
 const Login = () => {
   let navigateFunc = useNavigate();
   const { login } = useAuth();
-  const [isToastD, setIsToastD] = useState<boolean | null>(null);
-  const [toastLvl, setToastLvl] = useState<number>(0);
+  const [isToastDisplayed, setisToastDisplayed] = useState<boolean | null>(null);
+  const [toastLevel, settoastLevel] = useState<number>(0);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const fetchLogin = async (resp: string | boolean, navigate: any) => {
     if (resp === true) {
       navigate("/dashboard");
     } else if (resp === "incorrect_password") {
-      setToastLvl(1);
+      settoastLevel(1);
       setToastMsg("Incorrect Password.");
-      setIsToastD(true);
+      setisToastDisplayed(true);
     } else if (resp === "no_user") {
-      setToastLvl(2);
+      settoastLevel(2);
       setToastMsg("There is no user with that email.");
-      setIsToastD(true);
+      setisToastDisplayed(true);
     }
   };
 
   useEffect(() => {
-    if (!isToastD) return;
-    const timerId = window.setTimeout(() => setIsToastD(false), 5000);
+    if (!isToastDisplayed) return;
+    const timerId = window.setTimeout(() => setisToastDisplayed(false), 5000);
     return () => window.clearTimeout(timerId);
-  }, [isToastD]);
+  }, [isToastDisplayed]);
 
   return (
     <>
-      {isToastD && <ToastComponent msg={toastMsg} lvl={toastLvl} />}
+      {isToastDisplayed && <ToastComponent msg={toastMsg} lvl={toastLevel} />}
 
-      <AuthLayout
+      <AuthLayoutBase
         title="Login"
         children={
           <form

@@ -54,7 +54,7 @@ const NewTaskModal = ({
           await (update
             ? sendUpdatedTask(new FormData(e.currentTarget), taskId!)
             : sendNewTask(new FormData(e.currentTarget)));
-          await onTaskCreated();
+          onTaskCreated();
           setShownState(false);
         }}
         className="grid gap-4 justify-center"
