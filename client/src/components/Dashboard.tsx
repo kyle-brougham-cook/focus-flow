@@ -7,6 +7,7 @@ import MyIcon from "../assets/cog.svg";
 import SettingsModal from "./SettingsModal";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/axios";
+import TaskComponentSkeleton from "./TaskComponentSkeleton";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -81,9 +82,11 @@ const Dashboard = () => {
         >
           New Task
         </button>
-        <div className="grid grid-cols-2 has-[#loading-p]:grid-cols-1 gap-2 p-2 lg:grid-cols-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 has-[#loading-p]:grid-cols-1 gap-6 p-2 xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2">
           {isLoading ? (
-            <p id="loading-p" className="justify-self-center self-start text-2xl font-bold text-violet-700 pl-1 pr-1 hover:">Loading tasks...</p>
+            Array.from({ length: 9 }).map((_, index) => (
+              <TaskComponentSkeleton key={`taskSkeleton${index}`} />
+            ))
           ) : (
             tasks.map((task) => (
             <TaskComponent
