@@ -45,7 +45,7 @@ const TaskComponent = ({
       key={task.id}
       className={`shadow-md ${
         task.done ? "line-through" : ""
-      } bg-gray-50 ring-1 ring-violet-300 rounded-xl hover:shadow-xl transition-shadow w-[138px] sm:w-[265px] max-w-[265px] flex flex-col`}
+      } bg-gray-50 ring-1 ring-violet-300 rounded-xl hover:shadow-xl transition-shadow w-full max-w-sm mx-auto flex flex-col`}
     >
       <h3
         className={`text-2xl font-bold text-violet-700 truncate pl-1 pr-1 hover:`}

@@ -82,7 +82,7 @@ const Dashboard = () => {
         >
           New Task
         </button>
-        <div className="justify-items-center grid grid-cols-1 gap-6 p-2 xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2">
+        <div className="items-start justify-items-stretch grid grid-cols-1 gap-6 p-2 xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2">
           {isLoading ? (
             Array.from({ length: 9 }).map((_, index) => (
               <TaskComponentSkeleton key={`taskSkeleton${index}`} />
