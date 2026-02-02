@@ -10,7 +10,7 @@ from flask_jwt_extended import (
     create_refresh_token,
     jwt_required,
     get_jwt_identity,
-    set_access_cookies,
+    unset_jwt_cookies,
     set_refresh_cookies,
 )
 from sqlalchemy import select
@@ -100,6 +100,13 @@ def login_page():
             return response
     else:
         return jsonify({"status": "invalid_credentials"}), 401
+    
+
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify({"msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response, 200
 
 
 @auth_bp.route("/refresh", methods=["POST"])
