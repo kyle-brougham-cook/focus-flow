@@ -10,6 +10,8 @@ from flask_jwt_extended import (
     create_refresh_token,
     jwt_required,
     get_jwt_identity,
+    set_access_cookies,
+    set_refresh_cookies,
 )
 from sqlalchemy import select
 from ..models import User, db
@@ -88,21 +90,16 @@ def login_page():
             refresh_token = create_refresh_token(identity=str(user.id))
 
             response = make_response(
-                jsonify({"access_token": access_token, "user_name": user.username})
+                jsonify({
+                    "access_token": access_token,
+                    "user_name": user.username
+                })
             )
 
-            response.set_cookie(
-                "refresh_token_cookie",
-                refresh_token,
-                httponly=True,
-                secure=False,
-                samesite="Lax",
-                max_age=30 * 24 * 60 * 60,
-            )
-
+            set_refresh_cookies(response, refresh_token)
             return response
     else:
-        return jsonify({"status": "no_user"})
+        return jsonify({"status": "invalid_credentials"}), 401
 
 
 @auth_bp.route("/refresh", methods=["POST"])

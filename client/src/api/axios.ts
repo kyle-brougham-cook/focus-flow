@@ -1,4 +1,6 @@
 import axios from "axios";
+import Cookies from "js-cookie"
+
 
 export const api = axios.create({
   baseURL: import.meta.env.PROD
@@ -38,7 +40,11 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const res = await api.post("/auth/refresh");
+        const res = await api.post("/auth/refresh", {}, {
+          headers: {
+            "X-CSRF-TOKEN": Cookies.get("csrf_refresh_token") || "",
+          }
+        });
         const newAccess = res.data.access_token;
         localStorage.setItem("token", newAccess);
 

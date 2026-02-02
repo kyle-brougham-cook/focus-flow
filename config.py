@@ -4,7 +4,11 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    JWT_COOKIE_CSRF_PROTECT = False
+    JWT_COOKIE_SECURE = False
+    JWT_COOKIE_SAMESITE = "Lax"
+    JWT_COOKIE_CSRF_PROTECT = True
+    JWT_CSRF_IN_COOKIES = True
+    JWT_CSRF_METHODS = ["POST", "PUT", "PATCH", "DELETE"]
     JWT_TOKEN_LOCATION = ["headers", "cookies"]
     SECRET_KEY = os.environ.get("SECRET_KEY", "")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
@@ -13,6 +17,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
+    JWT_COOKIE_SECURE = True
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "")
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
@@ -21,6 +26,7 @@ class DevelopmentConfig(Config):
 
 
 class ProductionConfig(Config):
+    JWT_COOKIE_SECURE = True
     DEBUG = False
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "")
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "")
