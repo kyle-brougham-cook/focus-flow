@@ -87,6 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user && !token)
       return console.error("Error: there is currently no signed in user!");
 
+    api.post("/auth/logout");
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
