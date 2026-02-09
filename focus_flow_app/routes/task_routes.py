@@ -4,7 +4,7 @@ from ..models import db, Task, User
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 
-task_bp = Blueprint("task", __name__)
+tasks_bp = Blueprint("tasks", __name__)
 
 
 def get_user():
@@ -19,7 +19,7 @@ def get_user():
     return current_user
 
 
-@task_bp.route("/", methods=["GET"])
+@tasks_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_tasks():
     """
@@ -110,7 +110,7 @@ def validator(task: Task) -> bool:
     return True
 
 
-@task_bp.route("/tasks", methods=["POST", "PATCH"])  # type: ignore
+@tasks_bp.route("/tasks", methods=["POST", "PATCH"])  # type: ignore
 @jwt_required()
 def add_tasks():
     """
@@ -171,7 +171,7 @@ def add_tasks():
         return jsonify({"message": "Task updated!"}), 200
 
 
-@task_bp.route("/delete/<int:taskId>", methods=["DELETE"])
+@tasks_bp.route("/delete/<int:taskId>", methods=["DELETE"])
 @jwt_required()
 def delete_task(taskId):
     """
@@ -190,7 +190,7 @@ def delete_task(taskId):
     return jsonify({"message": "Task deleted!"}), 200
 
 
-@task_bp.route("/done/", methods=["PATCH"])
+@tasks_bp.route("/done/", methods=["PATCH"])
 @jwt_required()
 def completed_tasks():
     """

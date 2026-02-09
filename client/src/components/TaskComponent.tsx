@@ -11,7 +11,7 @@ interface Props {
 }
 
 const doneTask = async (id: string, bool: boolean) => {
-  const req = await api.patch('/task/done/', {
+  const req = await api.patch('/tasks/done/', {
     id: id,
     bool: bool,
   });
@@ -25,7 +25,7 @@ const doneTask = async (id: string, bool: boolean) => {
 const deleteTask = async (id: string) => {
   const taskId = Number(id);
 
-  const req = await api.delete(`/task/delete/${taskId}`);
+  const req = await api.delete(`/tasks/delete/${taskId}`);
 
   if (req.data.error)
     throw new Error(

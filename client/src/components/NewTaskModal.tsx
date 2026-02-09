@@ -4,7 +4,7 @@ import { api } from "../api/axios";
 const sendNewTask = async (form: FormData) => {
   const payload = Object.fromEntries(form.entries());
 
-  const response = await api.post('/task/tasks', payload);
+  const response = await api.post('/tasks/tasks', payload);
 
   if (response.data.error) {
     throw Error(`response was not okay: ${response.statusText}`);
@@ -17,7 +17,7 @@ const sendUpdatedTask = async (form: FormData, id: string) => {
 
   const payload = Object.fromEntries(form.entries());
 
-  const response = await api.patch('/task/tasks', payload);
+  const response = await api.patch('/tasks/tasks', payload);
 
   if (response.data.error)
     throw new Error(
