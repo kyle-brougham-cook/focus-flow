@@ -19,7 +19,7 @@ def get_user():
     return current_user
 
 
-@task_bp.route("/dashboard", methods=["GET"])
+@task_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_tasks():
     """
@@ -29,7 +29,7 @@ def get_tasks():
 
     current_user = get_user()
     if not current_user:
-        return jsonify({"Error": "No such user."}), 404
+        return jsonify({}), 401
 
     tasks = current_user.tasks.all()
 

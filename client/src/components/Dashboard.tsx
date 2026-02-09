@@ -31,7 +31,7 @@ const Dashboard = () => {
   const fetchTasks = async () => {
     setIsLoading(true);
     
-    const res = await api.get('/task/dashboard');
+    const res = await api.get('/task');
 
     const tasksArray = (await res.data) as Task[];
     setTasks(tasksArray);
