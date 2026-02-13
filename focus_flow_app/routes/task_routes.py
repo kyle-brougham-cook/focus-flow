@@ -132,7 +132,15 @@ def add_tasks():
             )
             db.session.add(new_task)
             db.session.commit()
-            return jsonify({"message": "Task added!", "task_id": new_task.id}), 201
+
+            new_task_data = {
+                "id": new_task.id,
+                "name": new_task.name,
+                "description": new_task.description,
+                "done": new_task.done
+            }
+
+            return jsonify(new_task_data), 201
         else:
             return (
                 jsonify(
