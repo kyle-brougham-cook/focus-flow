@@ -1,6 +1,7 @@
 from focus_flow_app.models import Task, User
 from focus_flow_app.__init__app import db
-from sqlalchemy import select
+from flask_jwt_extended import create_access_token
+from werkzeug.security import generate_password_hash
 
 
 def test_get_tasks_requires_auth(client):
@@ -21,6 +22,27 @@ def test_get_tasks_successful(client, auth_headers):
 
 
 def test_get_tasks_returns_only_users_tasks(client, auth_headers, dbf, user):
+
+    userB = User(
+                username="testUserNameB",
+                email="testUserB@example.com",
+                password=generate_password_hash("pass")
+            )
+
+    db.session.add(userB)
+
+    db.session.commit()
+    userB = db.session.get(User, 2)
+
+    db.session.add(
+        Task(
+            user_id=userB.id,
+            name="testTaskNameB",
+            description="testTaskDescriptionB",
+            done=False
+        )
+    )
+
     db.session.add(
         Task(
             user_id=user.id,
@@ -30,7 +52,7 @@ def test_get_tasks_returns_only_users_tasks(client, auth_headers, dbf, user):
         )
     )
 
-    dbf.session.commit()
+    db.session.commit()
 
     response = client.get("/api/tasks/", headers=auth_headers)
     assert response.status_code == 200
@@ -40,4 +62,6 @@ def test_get_tasks_returns_only_users_tasks(client, auth_headers, dbf, user):
 
     assert isinstance(data, list)
     assert len(data) == 1
+    assert data[0]["name"] == "testTaskName"
+
 
