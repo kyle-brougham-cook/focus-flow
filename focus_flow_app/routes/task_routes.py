@@ -14,7 +14,7 @@ def get_user():
     if not user_id:
         return False
 
-    current_user = User.query.get(int(user_id))
+    current_user = db.session.get(User, int(user_id))
 
     return current_user
 
