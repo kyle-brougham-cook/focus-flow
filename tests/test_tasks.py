@@ -65,3 +65,31 @@ def test_get_tasks_returns_only_users_tasks(client, auth_headers, dbf, user):
     assert data[0]["name"] == "testTaskName"
 
 
+
+def test_post_tasks_creation_no_token(client, dbf):
+    response = client.post("/api/tasks/tasks", json={})
+    assert response.status_code == 401
+
+
+def test_post_tasks_creation(client, auth_headers, user, dbf):
+    exptKeys = ["id", "name", "done", "description"]
+    response = client.post(
+        "/api/tasks/tasks",
+            headers=auth_headers,
+            json={"name": "postTestTaskName", "description": "test"}
+    )
+
+    assert response.status_code == 201
+    assert response.is_json
+
+    data = response.get_json()
+
+    assert isinstance(data["id"], int)
+
+    assert set(exptKeys).issubset(data.keys())
+
+    created_id = data["id"]
+    tasks = client.get("/api/tasks/", headers=auth_headers).get_json()
+    assert any(task["id"] == created_id for task in tasks)
+
+
