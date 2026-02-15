@@ -110,14 +110,13 @@ def validator(task: Task) -> bool:
     return True
 
 
-@tasks_bp.route("/tasks", methods=["POST", "PATCH"])  # type: ignore
+@tasks_bp.route("/", methods=["POST"])  # type: ignore
 @jwt_required()
 def add_tasks():
     """
-    Add a new task or update an existing task in the database.
+    Add a new task in the database.
     Expects JSON data with task details.
     """
-
     current_user = get_user()
     if not current_user:
         return jsonify({"error": "No such user."}), 404
@@ -149,34 +148,41 @@ def add_tasks():
                 422,
             )
 
-    elif request.method == "PATCH":
-        """
-        Update task's name and description using PATCH.
-        """
 
-        # We use this list to check for the expected
-        #  keys we are meant to recieve from the front-end
-        exp_keys = ["name", "description", "id"]
+@tasks_bp.route("/", methods=["PATCH"])
+@jwt_required
+def update_tasks():
+    """
+    Update task's name and description using PATCH.
+    """
 
-        data = request.get_json()
-        missing = [k for k in exp_keys if k not in data]
-        if missing:
-            return jsonify({"error": f"missing keys: {missing}"}), 400
+    current_user = get_user()
+    if not current_user:
+        return jsonify({"error": "No such user."}), 404
 
-        # Grabbing the task if it exists
-        tid = data["id"]
-        task = current_user.tasks.filter(Task.id == tid).first()
-        if not task:
-            return (
-                jsonify({"error": "Task not found or does not belong to current user"}),
-                404,
-            )
+    # We use this list to check for the expected
+    # keys we are meant to recieve from the front-end
+    exp_keys = ["name", "description", "id"]
 
-        # Making the changes to the task
-        task.name = data["name"]
-        task.description = data["description"]
-        db.session.commit()
-        return jsonify({"message": "Task updated!"}), 200
+    data = request.get_json()
+    missing = [k for k in exp_keys if k not in data]
+    if missing:
+        return jsonify({"error": f"missing keys: {missing}"}), 400
+
+    # Grabbing the task if it exists
+    tid = data["id"]
+    task = current_user.tasks.filter(Task.id == tid).first()
+    if not task:
+        return (
+            jsonify({"error": "Task not found or does not belong to current user"}),
+            404,
+        )
+
+    # Making the changes to the task
+    task.name = data["name"]
+    task.description = data["description"]
+    db.session.commit()
+    return jsonify({"message": "Task updated!"}), 200
 
 
 @tasks_bp.route("/delete/<int:taskId>", methods=["DELETE"])

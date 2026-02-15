@@ -67,14 +67,14 @@ def test_get_tasks_returns_only_users_tasks(client, auth_headers, dbf, user):
 
 
 def test_post_tasks_creation_no_token(client, dbf):
-    response = client.post("/api/tasks/tasks", json={})
+    response = client.post("/api/tasks/", json={})
     assert response.status_code == 401
 
 
-def test_post_tasks_creation(client, auth_headers, user, dbf):
+def test_post_tasks_creation(client, auth_headers, dbf, user):
     exptKeys = ["id", "name", "done", "description"]
     response = client.post(
-        "/api/tasks/tasks",
+        "/api/tasks/",
             headers=auth_headers,
             json={"name": "postTestTaskName", "description": "test"}
     )
