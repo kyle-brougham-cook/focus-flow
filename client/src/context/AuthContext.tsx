@@ -19,7 +19,7 @@ interface AuthContextInterface {
   login: (
     email: string,
     password: string
-  ) => Promise<boolean | "no_user" | "incorrect_password">;
+  ) => Promise<boolean | "invalid_credentials" | "incorrect_password">;
   logout: () => void;
   setAccessToken: (token: accessToken) => void;
   setUser: (user: user) => void;
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password: userPassword,
     });
 
-    if (response.data.status === "no_user") return "no_user";
+    if (response.data.status === "invalid_credentials") return "invalid_credentials";
 
     if (response.data.status === "wrong_password") return "incorrect_password";
 
@@ -94,6 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     setAccessToken(null);
     setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
