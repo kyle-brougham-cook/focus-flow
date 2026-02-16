@@ -93,3 +93,36 @@ def test_post_tasks_creation(client, auth_headers, dbf, user):
     assert any(task["id"] == created_id for task in tasks)
 
 
+def test_patch_tasks_edit(client, auth_headers, dbf, user):
+    exptKeys = ["id", "name", "done", "description"]
+    response = client.post(
+        "/api/tasks/",
+        headers=auth_headers,
+        json={"name": "patchTestTaskName", "description": "test"}
+    )
+
+    assert response.status_code == 201
+    assert response.is_json
+
+    taskId = response.get_json()["id"]
+
+    assert isinstance(taskId, int)
+    assert db.session.get(Task, taskId)
+
+    response = client.patch(
+        "/api/tasks/",
+        headers=auth_headers,
+        json={"id": taskId, "name": "newPatchTaskName", "description": "newTest"}
+    )
+
+    assert response.status_code == 200
+    assert response.is_json
+
+    editedTask = response.get_json()
+
+    assert set(editedTask.keys()).issubset(exptKeys)
+    assert editedTask["task"] == "newPatchTaskName"
+    assert editedTask["description"] == "newTest"
+
+
+
