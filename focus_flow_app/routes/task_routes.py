@@ -117,40 +117,40 @@ def add_tasks():
     Add a new task in the database.
     Expects JSON data with task details.
     """
+
     current_user = get_user()
     if not current_user:
         return jsonify({"error": "No such user."}), 404
 
-    if request.method == "POST":
-        data = request.get_json()
-        if validator_json(data):
-            new_task = Task(
-                name=data["name"],  # type: ignore
-                description=data["description"],  # type: ignore
-                user_id=current_user.id,  # type: ignore
-            )
-            db.session.add(new_task)
-            db.session.commit()
+    data = request.get_json()
+    if validator_json(data):
+        new_task = Task(
+            name=data["name"],  # type: ignore
+            description=data["description"],  # type: ignore
+            user_id=current_user.id,  # type: ignore
+        )
+        db.session.add(new_task)
+        db.session.commit()
 
-            new_task_data = {
-                "id": new_task.id,
-                "name": new_task.name,
-                "description": new_task.description,
-                "done": new_task.done
-            }
+        new_task_data = {
+            "id": new_task.id,
+            "name": new_task.name,
+            "description": new_task.description,
+            "done": new_task.done
+        }
 
-            return jsonify(new_task_data), 201
-        else:
-            return (
-                jsonify(
-                    {"error": "the provided data did not include all required info"}
-                ),
-                422,
-            )
+        return jsonify(new_task_data), 201
+    else:
+        return (
+            jsonify(
+                {"error": "the provided data did not include all required info"}
+            ),
+            422,
+        )
 
 
 @tasks_bp.route("/", methods=["PATCH"])
-@jwt_required
+@jwt_required()
 def update_tasks():
     """
     Update task's name and description using PATCH.
@@ -182,7 +182,17 @@ def update_tasks():
     task.name = data["name"]
     task.description = data["description"]
     db.session.commit()
-    return jsonify({"message": "Task updated!"}), 200
+
+
+    edited_task = {
+        "id": task.id,
+        "name": task.name,
+        "description": task.description,
+        "done": task.done
+    }
+
+
+    return jsonify(edited_task), 200
 
 
 @tasks_bp.route("/delete/<int:taskId>", methods=["DELETE"])
