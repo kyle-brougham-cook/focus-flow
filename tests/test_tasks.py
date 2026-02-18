@@ -30,9 +30,7 @@ def test_get_tasks_returns_only_users_tasks(client, auth_headers, dbf, user):
             )
 
     db.session.add(userB)
-
     db.session.commit()
-    userB = db.session.get(User, 2)
 
     db.session.add(
         Task(
@@ -121,8 +119,103 @@ def test_patch_tasks_edit(client, auth_headers, dbf, user):
     editedTask = response.get_json()
 
     assert set(editedTask.keys()).issubset(exptKeys)
-    assert editedTask["task"] == "newPatchTaskName"
+    assert editedTask["name"] == "newPatchTaskName"
     assert editedTask["description"] == "newTest"
+
+
+def test_delete_task_no_token(client, dbf, user, auth_headers):
+    
+    task = Task(
+        user_id=user.id,
+        name="testDeleteTaskName",
+        description="testDeleteTaskDescription",
+        done=False
+    )
+
+    db.session.add(task)
+    db.session.commit()
+
+    response = client.delete(
+        f"/api/tasks/delete/{task.id}"
+    )
+        
+    assert response.status_code == 401
+
+
+
+def test_delete_task_success(client, dbf, user, auth_headers):
+    
+    task = Task(
+        user_id=user.id,
+        name="testDeleteTaskName",
+        description="testDeleteTaskDescription",
+        done=False
+    )
+
+    db.session.add(task)
+    db.session.commit()
+
+    response = client.delete(
+        f"/api/tasks/delete/{task.id}",
+        headers=auth_headers
+    )
+        
+    assert response.status_code == 200
+
+    tasks = client.get(
+        "/api/tasks/",
+        headers=auth_headers
+    ).get_json()
+
+    assert len(tasks) <= 0
+
+
+def test_delete_another_users_task(client, dbf, user, auth_headers):
+
+    userB = User(
+        username="testUserNameDeleteTest",
+        email="testUserDeleteTest@example.com",
+        password=generate_password_hash("pass")
+    )
+
+    task = Task(
+        user_id=user.id,
+        name="testDeleteUserATaskName",
+        description="testDeleteUserATaskDescription",
+        done=False
+    )
+
+
+    db.session.add(task)
+    db.session.add(userB)
+    db.session.commit()
+
+    token = create_access_token(identity=str(userB.id))
+
+    auth_headers_user_b = {"Authorization": f"Bearer {token}"}
+
+    response = client.delete(
+        f"/api/tasks/delete/{task.id}",
+        headers=auth_headers_user_b
+    )
+
+    assert response.status_code == 404
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

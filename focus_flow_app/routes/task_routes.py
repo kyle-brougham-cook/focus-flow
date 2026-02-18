@@ -204,14 +204,14 @@ def delete_task(taskId):
     """
     current_user = get_user()
     if not current_user:
-        return jsonify({"error": "No such user."}), 404
+        return jsonify({}), 401
 
     task = current_user.tasks.filter(Task.id == taskId).first()
     if task is None:
         return jsonify({"error": "Task not found!"}), 404
     db.session.delete(task)
     db.session.commit()
-    return jsonify({"message": "Task deleted!"}), 200
+    return jsonify({}), 200
 
 
 @tasks_bp.route("/done/", methods=["PATCH"])
