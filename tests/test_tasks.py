@@ -203,6 +203,52 @@ def test_delete_another_users_task(client, dbf, user, auth_headers):
 
 
 
+    
+def test_patch_task_done_status_no_token(client, dbf, user):
+
+
+    task = Task(
+        user_id = user.id,
+        name = "testPatchUserTaskDoneName",
+        description = "testPatchUserTaskDoneDescription",
+        done = False
+    )
+
+    db.session.add(task)
+    db.session.commit()
+
+
+    response = client.patch(f"/api/tasks/{task.id}/done/")
+
+    assert response.status_code == 401
+
+
+def test_patch_task_done_status(client, user, dbf, auth_headers):
+
+    task = Task(
+            user_id = user.id,
+            name = "testPatchUserTaskDoneSuccessName",
+            description = "testPatchUserTaskDoneSuccessDescription",
+            done = False
+        )
+
+    db.session.add(task)
+    db.session.commit()
+
+    responseTrue = client.patch(f"/api/tasks/{task.id}/done/", headers=auth_headers)
+
+    assert responseTrue.get_json()["done"] == True 
+
+
+    responseFalse = client.patch(f"/api/tasks/{task.id}/done/", headers=auth_headers)
+
+    assert responseFalse.get_json()["done"] == False
+
+
+# WE HERE!
+
+    
+
 
 
 

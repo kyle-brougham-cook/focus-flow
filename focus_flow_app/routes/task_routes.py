@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime
+from sqlalchemy import select
 from ..models import db, Task, User
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
@@ -214,9 +215,9 @@ def delete_task(taskId):
     return jsonify({}), 200
 
 
-@tasks_bp.route("/done/", methods=["PATCH"])
+@tasks_bp.route("/<int:taskId>/done/", methods=["PATCH"])
 @jwt_required()
-def completed_tasks():
+def completed_tasks(taskId):
     """
     Mark the specified task as done or not done.
     """
@@ -224,29 +225,17 @@ def completed_tasks():
     if not current_user:
         return jsonify({"error": "No such user."}), 404
 
-    if not request.is_json:
-        return jsonify({"error": "invalid data, data needs to be inside json"}), 400
-
-    data = request.get_json()
-    id = data["id"]
 
     # Update the 'done' attribute of the task.
-    task = current_user.tasks.filter(Task.id == id).first()
+    # task = current_user.tasks.filter(Task.id == taskId).first()
+    task = db.session.scalars(select(Task).where(Task.id == taskId)).first()
     if not task:
-        return jsonify({"error": f"The Task with the ID: {id} doesnt exist!"}), 404
+        return jsonify({"error": f"The Task with the ID: {taskId} doesnt exist!"}), 404
+    
+    task.done = not task.done
+    db.session.commit()
 
-    if "bool" in data and isinstance(data["bool"], bool):
-        task.done = data["bool"]
-        db.session.commit()
-        # Return a response with the updated task state.
-        return jsonify({"message": f"Task done set as {data['bool']}!"}), 200
-    else:
-        return (
-            jsonify(
-                {
-                    "error": f"data doesnt have the correct key-value pair \
-                    (bool:true|false) instead it has {data}"
-                }
-            ),
-            400,
-        )
+    # Return a response with the updated task state.
+    return jsonify({"done": task.done}), 200
+    
+       
