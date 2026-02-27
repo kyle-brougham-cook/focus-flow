@@ -226,8 +226,6 @@ def completed_tasks(taskId):
         return jsonify({"error": "No such user."}), 404
 
 
-    # Update the 'done' attribute of the task.
-    # task = current_user.tasks.filter(Task.id == taskId).first()
     task = db.session.scalars(select(Task).where(Task.id == taskId, Task.user_id == current_user.id)).first()
     if not task:
         return jsonify({"error": f"The Task with the ID: {taskId} doesnt exist!"}), 404

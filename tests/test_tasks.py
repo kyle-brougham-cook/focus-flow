@@ -118,12 +118,12 @@ def test_patch_tasks_edit(client, auth_headers, dbf, user):
 
     editedTask = response.get_json()
 
-    assert set(editedTask.keys()).issubset(exptKeys)
+    assert set(exptKeys).issubset(editedTask.keys())
     assert editedTask["name"] == "newPatchTaskName"
     assert editedTask["description"] == "newTest"
 
 
-def test_delete_task_no_token(client, dbf, user, auth_headers):
+def test_delete_task_no_token(client, dbf, user):
     
     task = Task(
         user_id=user.id,
@@ -167,10 +167,10 @@ def test_delete_task_success(client, dbf, user, auth_headers):
         headers=auth_headers
     ).get_json()
 
-    assert len(tasks) <= 0
+    assert len(tasks) == 0
 
 
-def test_delete_another_users_task(client, dbf, user, auth_headers):
+def test_delete_another_users_task(client, dbf, user):
 
     userB = User(
         username="testUserNameDeleteTest",
@@ -225,27 +225,50 @@ def test_patch_task_done_status_no_token(client, dbf, user):
 
 def test_patch_task_done_status(client, user, dbf, auth_headers):
 
+    userB = User(
+        username="testUserNameDoneTest",
+        email="testUserDoneTest@example.com",
+        password=generate_password_hash("pass")
+    )
+
     task = Task(
             user_id = user.id,
             name = "testPatchUserTaskDoneSuccessName",
             description = "testPatchUserTaskDoneSuccessDescription",
             done = False
-        )
+    )
 
-    db.session.add(task)
+    db.session.add_all([task, userB])
+    db.session.commit()    
+
+    userB_headers = {"Authorization": f"Bearer {create_access_token(identity=str(userB.id))}"}
+
+    taskB = Task(
+        user_id = userB.id,
+        name = "testPatchUserTaskDoneSuccessNameB",
+        description = "testPatchUserTaskDoneSuccessDescriptionB",
+        done = False
+    )
+
+    db.session.add(taskB)
     db.session.commit()
 
     responseTrue = client.patch(f"/api/tasks/{task.id}/done/", headers=auth_headers)
 
-    assert responseTrue.get_json()["done"] == True 
+    assert responseTrue.status_code == 200
+    assert responseTrue.is_json
+    assert responseTrue.get_json()["done"] is True
 
+    responseDoneToggle = client.patch(f"/api/tasks/{task.id}/done/", headers=userB_headers)
+    assert responseDoneToggle.status_code == 404
 
     responseFalse = client.patch(f"/api/tasks/{task.id}/done/", headers=auth_headers)
 
-    assert responseFalse.get_json()["done"] == False
+    assert responseFalse.status_code == 200
+    assert responseFalse.is_json
+    assert responseFalse.get_json()["done"] is False
 
 
-# WE HERE!
 
     
 
