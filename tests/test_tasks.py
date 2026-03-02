@@ -93,24 +93,23 @@ def test_post_tasks_creation(client, auth_headers, dbf, user):
 
 def test_patch_tasks_edit(client, auth_headers, dbf, user):
     exptKeys = ["id", "name", "done", "description"]
-    response = client.post(
-        "/api/tasks/",
-        headers=auth_headers,
-        json={"name": "patchTestTaskName", "description": "test"}
+
+    task = Task(
+        user_id = user.id,
+        name = "patchTestTaskName",
+        description = "test",
+        done = False
     )
 
-    assert response.status_code == 201
-    assert response.is_json
+    db.session.add(task)
+    db.session.commit()
 
-    taskId = response.get_json()["id"]
 
-    assert isinstance(taskId, int)
-    assert db.session.get(Task, taskId)
 
     response = client.patch(
-        "/api/tasks/",
+        f"/api/tasks/{task.id}/",
         headers=auth_headers,
-        json={"id": taskId, "name": "newPatchTaskName", "description": "newTest"}
+        json={"name": "newPatchTaskName", "description": "newTest"}
     )
 
     assert response.status_code == 200
@@ -136,7 +135,7 @@ def test_delete_task_no_token(client, dbf, user):
     db.session.commit()
 
     response = client.delete(
-        f"/api/tasks/delete/{task.id}"
+        f"/api/tasks/{task.id}/delete/"
     )
         
     assert response.status_code == 401
@@ -156,7 +155,7 @@ def test_delete_task_success(client, dbf, user, auth_headers):
     db.session.commit()
 
     response = client.delete(
-        f"/api/tasks/delete/{task.id}",
+        f"/api/tasks/{task.id}/delete/",
         headers=auth_headers
     )
         
@@ -195,7 +194,7 @@ def test_delete_another_users_task(client, dbf, user):
     auth_headers_user_b = {"Authorization": f"Bearer {token}"}
 
     response = client.delete(
-        f"/api/tasks/delete/{task.id}",
+        f"/api/tasks/{task.id}/delete/",
         headers=auth_headers_user_b
     )
 
