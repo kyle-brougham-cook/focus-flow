@@ -196,7 +196,7 @@ def update_tasks():
     return jsonify(edited_task), 200
 
 
-@tasks_bp.route("/delete/<int:taskId>", methods=["DELETE"])
+@tasks_bp.route("/<int:taskId>/delete/", methods=["DELETE"])
 @jwt_required()
 def delete_task(taskId):
     """
