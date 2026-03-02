@@ -150,9 +150,9 @@ def add_tasks():
         )
 
 
-@tasks_bp.route("/", methods=["PATCH"])
+@tasks_bp.route("/<int:taskId>/", methods=["PATCH"])
 @jwt_required()
-def update_tasks():
+def update_tasks(taskId):
     """
     Update task's name and description using PATCH.
     """
@@ -163,7 +163,7 @@ def update_tasks():
 
     # We use this list to check for the expected
     # keys we are meant to recieve from the front-end
-    exp_keys = ["name", "description", "id"]
+    exp_keys = ["name", "description"]
 
     data = request.get_json()
     missing = [k for k in exp_keys if k not in data]
@@ -171,8 +171,7 @@ def update_tasks():
         return jsonify({"error": f"missing keys: {missing}"}), 400
 
     # Grabbing the task if it exists
-    tid = data["id"]
-    task = current_user.tasks.filter(Task.id == tid).first()
+    task = current_user.tasks.filter(Task.id == taskId).first()
     if not task:
         return (
             jsonify({"error": "Task not found or does not belong to current user"}),
