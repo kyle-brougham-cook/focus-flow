@@ -11,10 +11,15 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    const unsafeMethods = ["POST", "PATCH", "PUT", "DELETE", "post", "patch", "put", "delete"]
     const token = localStorage.getItem("token");
 
     if (token && !config.url?.includes("/auth/refresh")) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (unsafeMethods.includes(config.method!)) {
+        config.headers["X-CSRF-TOKEN"] = Cookies.get("csrf_refresh_token") || "";
     }
 
     return config;
@@ -29,6 +34,7 @@ api.interceptors.response.use(
 
   async (error) => {
     const originalRequest = error.config;
+    console.log("test")
 
     if (
       error.response?.status === 401 &&
@@ -40,11 +46,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const res = await api.post("/auth/refresh", {}, {
-          headers: {
-            "X-CSRF-TOKEN": Cookies.get("csrf_refresh_token") || "",
-          }
-        });
+        const res = await api.post("/auth/refresh");
         const newAccess = res.data.access_token;
         localStorage.setItem("token", newAccess);
 
