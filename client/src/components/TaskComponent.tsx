@@ -10,11 +10,8 @@ interface Props {
   refreshTasks: () => void;
 }
 
-const doneTask = async (id: string, bool: boolean) => {
-  const req = await api.patch('/tasks/done/', {
-    id: id,
-    bool: bool,
-  });
+const doneTask = async (id: string) => {
+  const req = await api.patch(`/tasks/${id}/done/`);
 
   if (req.data.error)
     throw new Error(
@@ -25,7 +22,7 @@ const doneTask = async (id: string, bool: boolean) => {
 const deleteTask = async (id: string) => {
   const taskId = Number(id);
 
-  const req = await api.delete(`/tasks/delete/${taskId}`);
+  const req = await api.delete(`/tasks/${taskId}/delete/`);
 
   if (req.data.error)
     throw new Error(
@@ -59,7 +56,7 @@ const TaskComponent = ({
         <button
           className="flex-1 border border-violet-600 text-violet-600 rounded hover:bg-violet-100 transition"
           onClick={async () => {
-            await doneTask(task.id, task.done);
+            await doneTask(task.id);
             refreshTasks();
           }}
         >

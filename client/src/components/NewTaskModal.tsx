@@ -13,11 +13,10 @@ const sendNewTask = async (form: FormData) => {
 };
 
 const sendUpdatedTask = async (form: FormData, id: string) => {
-  form.append("id", id);
 
   const payload = Object.fromEntries(form.entries());
 
-  const response = await api.patch('/tasks/', payload);
+  const response = await api.patch(`/tasks/${id}/`, payload);
 
   if (response.data.error)
     throw new Error(
@@ -54,6 +53,7 @@ const NewTaskModal = ({
           await (update
             ? sendUpdatedTask(new FormData(e.currentTarget), taskId!)
             : sendNewTask(new FormData(e.currentTarget)));
+          if (update) updateSetter(false);
           onTaskCreated();
           setShownState(false);
         }}
@@ -95,7 +95,7 @@ const NewTaskModal = ({
             onClick={(e) => {
               e.preventDefault();
               setShownState((prev) => !prev);
-              updateSetter((prev) => (prev ? !prev : prev));
+              updateSetter(false);
             }}
           >
             Close
