@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie"
+import { setToken, getToken } from "./tokenStore";
 
 
 export const api = axios.create({
@@ -12,7 +13,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const unsafeMethods = ["POST", "PATCH", "PUT", "DELETE", "post", "patch", "put", "delete"]
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     if (token && !config.url?.includes("/auth/refresh")) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -34,13 +35,11 @@ api.interceptors.response.use(
 
   async (error) => {
     const originalRequest = error.config;
-    console.log("test")
 
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh") &&
-      localStorage.getItem("token")
+      !originalRequest.url.includes("/auth/refresh")
     ) {
 
       originalRequest._retry = true;
@@ -48,7 +47,7 @@ api.interceptors.response.use(
       try {
         const res = await api.post("/auth/refresh");
         const newAccess = res.data.access_token;
-        localStorage.setItem("token", newAccess);
+        setToken(newAccess);
 
         originalRequest.headers.Authorization = `Bearer ${newAccess}`;
 

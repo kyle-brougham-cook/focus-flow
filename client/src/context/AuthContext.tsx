@@ -7,6 +7,7 @@ import {
 } from "react";
 import { api } from "../api/axios";
 import { registerLogout } from "../auth/authHandler";
+import { clearToken, setToken } from "../api/tokenStore";
 
 type accessToken = string | null;
 type user = string | null;
@@ -34,12 +35,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-
-    if (savedToken) setAccessToken(savedToken);
-    if (savedUser) setUser(savedUser);
-
     registerLogout(logout);
   }, []);
 
@@ -48,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const res = await api.post("/auth/refresh");
         setAccessToken(res.data.access_token);
+        setToken(res.data.access_token)
         setIsAuthenticated(true);
       } catch {
         setAccessToken(null);
@@ -71,10 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (response.data.status === "wrong_password") return "incorrect_password";
 
     if (response.data["access_token"]) {
-      localStorage.setItem("token", response.data["access_token"]);
-      localStorage.setItem("user", response.data["user_name"]);
 
       setAccessToken(response.data["access_token"]);
+      setToken(response.data["access_token"])
       setUser(response.data["user_name"]);
       setIsAuthenticated(true);
 
@@ -89,10 +84,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     api.post("/auth/logout");
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
     setAccessToken(null);
+    clearToken();
     setUser(null);
     setIsAuthenticated(false);
   };
