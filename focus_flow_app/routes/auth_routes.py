@@ -90,17 +90,14 @@ def login_page():
             refresh_token = create_refresh_token(identity=str(user.id))
 
             response = make_response(
-                jsonify({
-                    "access_token": access_token,
-                    "user_name": user.username
-                })
+                jsonify({"access_token": access_token, "user_name": user.username})
             )
 
             set_refresh_cookies(response, refresh_token)
             return response
     else:
         return jsonify({"status": "invalid_credentials"}), 401
-    
+
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():

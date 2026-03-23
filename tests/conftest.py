@@ -4,6 +4,7 @@ from focus_flow_app.models import User
 from werkzeug.security import generate_password_hash
 from flask_jwt_extended import create_access_token
 
+
 @pytest.fixture
 def app():
     # Create the Flask app with the testing configuration
@@ -35,7 +36,7 @@ def user(dbf):
     user = User(
         username="testinguser",
         email="test@example.com",
-        password=generate_password_hash("password123")
+        password=generate_password_hash("password123"),
     )
 
     db.session.add(user)
@@ -47,10 +48,4 @@ def user(dbf):
 @pytest.fixture
 def auth_headers(user):
     token = create_access_token(identity=str(user.id))
-    return {
-        "Authorization": f"Bearer {token}"
-    }
-
-
-
-
+    return {"Authorization": f"Bearer {token}"}

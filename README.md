@@ -100,7 +100,7 @@ This project implements a **JWT-based authentication system** designed to reduce
 
 ### Why not localStorage?
 
-LocalStorage is vulnerable to XSS attacks.  
+LocalStorage is vulnerable to XSS attacks.
 Storing tokens in memory and using HTTP-only cookies for refresh tokens reduces the risk of token theft.
 
 ---

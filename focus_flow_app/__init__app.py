@@ -38,6 +38,7 @@ def create_app(config_name: str | None = None):
     )
 
     from .routes.__init__routes import register_routes
+
     register_routes(app)
 
     return app

@@ -137,15 +137,13 @@ def add_tasks():
             "id": new_task.id,
             "name": new_task.name,
             "description": new_task.description,
-            "done": new_task.done
+            "done": new_task.done,
         }
 
         return jsonify(new_task_data), 201
     else:
         return (
-            jsonify(
-                {"error": "the provided data did not include all required info"}
-            ),
+            jsonify({"error": "the provided data did not include all required info"}),
             422,
         )
 
@@ -183,14 +181,12 @@ def update_tasks(taskId):
     task.description = data["description"]
     db.session.commit()
 
-
     edited_task = {
         "id": task.id,
         "name": task.name,
         "description": task.description,
-        "done": task.done
+        "done": task.done,
     }
-
 
     return jsonify(edited_task), 200
 
@@ -224,15 +220,14 @@ def completed_tasks(taskId):
     if not current_user:
         return jsonify({"error": "No such user."}), 404
 
-
-    task = db.session.scalars(select(Task).where(Task.id == taskId, Task.user_id == current_user.id)).first()
+    task = db.session.scalars(
+        select(Task).where(Task.id == taskId, Task.user_id == current_user.id)
+    ).first()
     if not task:
         return jsonify({"error": f"The Task with the ID: {taskId} doesnt exist!"}), 404
-    
+
     task.done = not task.done
     db.session.commit()
 
     # Return a response with the updated task state.
     return jsonify({"done": task.done}), 200
-    
-       

@@ -23,8 +23,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DEV_DATABASE_URL",
-        "sqlite:///" + os.path.join(base_dir, "instance", "dev.db")
+        "DEV_DATABASE_URL", "sqlite:///" + os.path.join(base_dir, "instance", "dev.db")
     )
 
 
@@ -34,6 +33,7 @@ class ProductionConfig(Config):
 
     JWT_COOKIE_SECURE = True
     JWT_COOKIE_SAMESITE = "None"
+
 
 class TestingConfig(Config):
     TESTING = True
