@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie"
 import { setToken, getToken } from "./tokenStore";
+import { forceLogout } from "../auth/authHandler";
 
 
 export const api = axios.create({
@@ -12,14 +13,14 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const unsafeMethods = ["POST", "PATCH", "PUT", "DELETE", "post", "patch", "put", "delete"]
+    const unsafeMethods = ["post", "patch", "put", "delete"]
     const token = getToken();
 
     if (token && !config.url?.includes("/auth/refresh")) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    if (unsafeMethods.includes(config.method!)) {
+    if (config.method && unsafeMethods.includes(config.method.toLocaleLowerCase())) {
         config.headers["X-CSRF-TOKEN"] = Cookies.get("csrf_refresh_token") || "";
     }
 
@@ -38,10 +39,9 @@ api.interceptors.response.use(
 
     if (
       error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/refresh")
+      !originalRequest?._retry &&
+      !originalRequest?.url?.includes("/auth/refresh")
     ) {
-
       originalRequest._retry = true;
 
       try {
@@ -53,7 +53,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        
+        forceLogout();
         return Promise.reject(refreshError);
       }
     }

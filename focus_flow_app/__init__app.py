@@ -16,22 +16,28 @@ jwt = JWTManager()
 def create_app(config_name: str | None = None):
     load_dotenv()
 
-    cfg_key = config_name or os.getenv("FLASK_CONFIG", "development")
+    cfg_key = (config_name or os.getenv("FLASK_CONFIG", "development")).lower()
     cfg_class = config_map.get(cfg_key)
     if not cfg_class:
         raise RuntimeError(f"Unknown FLASK_CONFIG: {cfg_key}")
 
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object(cfg_class)
-    jwt.init_app(app)
 
+    jwt.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
 
-    CORS(app, supports_credentials=True, origins=[app.config["CORS_ORIGINS"]])
+    raw_origins = app.config["CORS_ORIGINS"]
+    origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+    CORS(
+        app,
+        supports_credentials=True,
+        origins=origins,
+    )
 
     from .routes.__init__routes import register_routes
-
     register_routes(app)
 
     return app
