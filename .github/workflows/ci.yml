@@ -41,7 +41,7 @@ jobs:
         env:
           FLASK_CONFIG: testing
         run: |
-          pytest
+          python -m pytest
 
   frontend-build:
     name: Build Frontend
