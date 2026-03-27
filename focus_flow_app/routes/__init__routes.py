@@ -3,6 +3,7 @@ from .main_routes import main_bp
 from .task_routes import tasks_bp
 from .health_routes import health_db
 
+
 def register_routes(app):
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(main_bp, url_prefix="/api/main")
