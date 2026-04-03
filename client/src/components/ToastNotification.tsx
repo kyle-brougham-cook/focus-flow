@@ -4,16 +4,16 @@ interface ToastProps {
 }
 
 const ToastComponent = ({ msg, lvl }: ToastProps) => {
-  const alertTheme = "text-red-600";
-  const warningTheme = "text-orange-600";
-  const notificationTheme = "text-violet-600";
+  const alertTheme = "text-3xl text-red-600";
+  const warningTheme = "text-3xl text-orange-600";
+  const notificationTheme = "text-3xl text-violet-600";
 
   const theme = [alertTheme, warningTheme, notificationTheme];
 
   return (
     <div
       className={
-        "flex justify-center items-center absolute z-999 w-94 h-50 left-74 rounded-md bg-violet-200/90 border-violet-600 text-3xl " +
+        "fixed top-0 left-1/2 -translate-x-1/2 z-50 p-4 rounded-md bg-violet-300/90 border-violet-600 shadow-lg" +
         theme[lvl]
       }
     >

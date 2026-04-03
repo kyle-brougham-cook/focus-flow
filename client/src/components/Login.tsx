@@ -10,16 +10,17 @@ const Login = () => {
   const [isToastDisplayed, setisToastDisplayed] = useState<boolean | null>(null);
   const [toastLevel, settoastLevel] = useState<number>(0);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [isSubmiting, setIsSubtmiting] = useState<boolean>(false);
 
   const fetchLogin = async (resp: string | boolean, navigate: any) => {
     if (resp === true) {
       navigate("/dashboard");
-    } else if (resp === "incorrect_password") {
+    } else if (resp === "wrong_password") {
       settoastLevel(1);
       setToastMsg("Incorrect Password.");
       setisToastDisplayed(true);
     } else if (resp === "no_user") {
-      settoastLevel(2);
+      settoastLevel(1);
       setToastMsg("There is no user with that email.");
       setisToastDisplayed(true);
     }
@@ -41,15 +42,22 @@ const Login = () => {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const payload = {
-                email: (formData.get("email") as string) ?? "",
-                password: (formData.get("password") as string) ?? "",
-              };
-              fetchLogin(
-                await login(payload.email, payload.password),
-                navigateFunc
-              );
+              setIsSubtmiting(true);
+              try {
+
+                const formData = new FormData(e.currentTarget);
+                const payload = {
+                  email: (formData.get("email") as string) ?? "",
+                  password: (formData.get("password") as string) ?? "",
+                };
+                fetchLogin(
+                  await login(payload.email, payload.password),
+                  navigateFunc
+                );
+
+                } finally {
+                setIsSubtmiting(false);
+              }
             }}
           >
             <div className="flex flex-col gap-1 text-2xl text-[#8B5CF6]">
@@ -83,7 +91,8 @@ const Login = () => {
 
             <button
               type="submit"
-              className="mt-6 mb-2 bg-[#8B5CF6] text-white py-2 px-4 rounded hover:bg-[#7C3AED]"
+              className={`mt-6 mb-2 ${isSubmiting ? "bg-[#808080] hover:bg-[#808080]" : "bg-[#8B5CF6] hover:bg-[#7C3AED]"} text-white py-2 px-4 rounded`}
+              disabled={isSubmiting}
             >
               Login
             </button>
