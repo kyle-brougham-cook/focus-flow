@@ -49,7 +49,7 @@ const TaskComponent = ({
       >
         {task.name}
       </h3>
-      <p className="break-words scrollbar scrollbar-thumb-violet-500 scrollbar-track-transparent h-20 text-1xl text-gray-600 mb-4 overflow-y-scroll overflow-x-hidden p-1">
+      <p className="break-words scrollbar scrollbar-thumb-violet-500 scrollbar-track-transparent h-20 text-1xl text-violet-500 mb-4 overflow-y-scroll overflow-x-hidden p-1">
         {task.description}
       </p>
       <div className="flex flex-col sm:flex-row justify-center gap-2 w-full mt-2 p-2">

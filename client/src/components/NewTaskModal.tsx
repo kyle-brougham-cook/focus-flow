@@ -1,6 +1,7 @@
 import type React from "react";
 import { api } from "../api/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { Task } from "../types/task";
 
 const sendNewTask = async (form: FormData) => {
   const payload = Object.fromEntries(form.entries());
@@ -29,6 +30,7 @@ const sendUpdatedTask = async (form: FormData, id: string) => {
 const NewTaskModal = ({
   update,
   taskId,
+  task,
   setShownState,
   onTaskCreated,
   updateSetter,
@@ -38,9 +40,19 @@ const NewTaskModal = ({
   updateSetter: React.Dispatch<React.SetStateAction<boolean>>;
   update: boolean;
   taskId?: string;
+  task?: Task;
 }) => {
   const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
+  const [nameInputValue, setNameInputValue] = useState<string | undefined>("");
+  const [descriptionInputValue, setDescriptionInputValue] = useState<string | undefined>("");
   const title = update ? "Edit Task" : "Create A New Task";
+
+  useEffect(() => {
+    if (update) {
+      setNameInputValue(task?.name);
+      setDescriptionInputValue(task?.description);
+    }
+  }, [update, task?.name, task?.description])
 
   return (
     <div
@@ -70,9 +82,11 @@ const NewTaskModal = ({
         </label>
 
         <input
-          className="bg-white rounded h-8 p-1"
+          className="bg-white rounded h-8 p-1 text-violet-500"
           name="name"
           type="text"
+          value={nameInputValue}
+          onChange={(e) => setNameInputValue(e.target.value)}
           id="taskName"
           maxLength={60}
         />
@@ -82,8 +96,10 @@ const NewTaskModal = ({
         </label>
 
         <textarea
-          className="bg-white rounded h-40 w-80 p-1 resize-none overflowY-auto"
+          className="bg-white rounded h-40 w-80 p-1 resize-none overflowY-auto text-violet-500"
           name="description"
+          value={descriptionInputValue}
+          onChange={(e) => setDescriptionInputValue(e.target.value)}
           id="taskDescription"
           maxLength={500}
         />

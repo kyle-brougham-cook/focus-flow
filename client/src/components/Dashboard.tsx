@@ -53,6 +53,7 @@ const Dashboard = () => {
             setShownState={setIsOpen}
             onTaskCreated={fetchTasks}
             taskId={taskId}
+            task={tasks.find(t => t.id == taskId)}
           />
         </>
       )}
