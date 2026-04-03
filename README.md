@@ -8,7 +8,7 @@ Unlike many task management apps that overload users with features, Focus Flow f
 
 ## 🚀 Live Demo
 
-[WIP]
+https://focus-flow-gules.vercel.app
 
 ---
 
