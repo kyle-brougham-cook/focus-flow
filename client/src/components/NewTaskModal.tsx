@@ -1,5 +1,6 @@
 import type React from "react";
 import { api } from "../api/axios";
+import { useState } from "react";
 
 const sendNewTask = async (form: FormData) => {
   const payload = Object.fromEntries(form.entries());
@@ -38,6 +39,7 @@ const NewTaskModal = ({
   update: boolean;
   taskId?: string;
 }) => {
+  const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
   const title = update ? "Edit Task" : "Create A New Task";
 
   return (
@@ -49,13 +51,17 @@ const NewTaskModal = ({
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-
-          await (update
-            ? sendUpdatedTask(new FormData(e.currentTarget), taskId!)
-            : sendNewTask(new FormData(e.currentTarget)));
-          if (update) updateSetter(false);
-          onTaskCreated();
-          setShownState(false);
+          setIsSubmiting(true);
+          try {
+            await (update
+              ? sendUpdatedTask(new FormData(e.currentTarget), taskId!)
+              : sendNewTask(new FormData(e.currentTarget)));
+            if (update) updateSetter(false);
+            onTaskCreated();
+            setShownState(false);
+          } finally {
+            setIsSubmiting(false);
+          }
         }}
         className="grid gap-4 justify-center"
       >
@@ -86,6 +92,7 @@ const NewTaskModal = ({
           <button
             className="text-2xl text-violet-500 border rounded p-1 hover:text-violet-700"
             type="submit"
+            disabled={isSubmiting}
           >
             {update ? "Confirm" : "Create"}
           </button>

@@ -16,6 +16,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [isSubmiting, setIsSubmiting] = useState<boolean>(false)
 
   const signUpData = async (data: data) => {
     const response = await api.post('/auth/signup', data);
@@ -25,6 +26,8 @@ const SignUp = () => {
     }
 
     await login(data.email, data.password);
+    setIsSubmiting(false);
+
     navigate("/dashboard");
 
     return response.data;
@@ -38,6 +41,7 @@ const SignUp = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              setIsSubmiting(true);
               signUpData({ name: name, email: email, password: password });
             }}
           >
@@ -88,6 +92,7 @@ const SignUp = () => {
             <button
               type="submit"
               className="mt-6 mb-2 bg-[#8B5CF6] text-white py-2 px-4 rounded hover:bg-[#7C3AED]"
+              disabled={isSubmiting}
             >
               Confirm
             </button>

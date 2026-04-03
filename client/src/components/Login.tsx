@@ -44,16 +44,13 @@ const Login = () => {
               e.preventDefault();
               setIsSubtmiting(true);
               try {
-
                 const formData = new FormData(e.currentTarget);
                 const payload = {
                   email: (formData.get("email") as string) ?? "",
                   password: (formData.get("password") as string) ?? "",
                 };
-                fetchLogin(
-                  await login(payload.email, payload.password),
-                  navigateFunc
-                );
+                const resp = await login(payload.email, payload.password)
+                fetchLogin(resp, navigateFunc);
 
                 } finally {
                 setIsSubtmiting(false);
