@@ -3,7 +3,7 @@ import { api } from "../api/axios";
 import { useEffect, useState } from "react";
 import type { Task } from "../types/task";
 
-const sendNewTask = async (form: FormData) => {
+const sendNewTask = async (form: FormData ) => {
   const payload = Object.fromEntries(form.entries());
 
   const response = await api.post('/tasks/', payload);
@@ -11,10 +11,10 @@ const sendNewTask = async (form: FormData) => {
   if (response.data.error) {
     throw Error(`response was not okay: ${response.statusText}`);
   }
-  return console.log(await response.data);
+  return await response.data;
 };
 
-const sendUpdatedTask = async (form: FormData, id: string) => {
+const sendUpdatedTask = async (form: FormData, id: string ) => {
 
   const payload = Object.fromEntries(form.entries());
 
@@ -24,7 +24,8 @@ const sendUpdatedTask = async (form: FormData, id: string) => {
     throw new Error(
       `response was not okay - sendUpdatedTask:${response.statusText}`
     );
-  return console.log(await response.data);
+
+  return await response.data
 };
 
 const NewTaskModal = ({
@@ -34,23 +35,25 @@ const NewTaskModal = ({
   setShownState,
   onTaskCreated,
   updateSetter,
+  taskSetter,
 }: {
   setShownState: React.Dispatch<React.SetStateAction<boolean>>;
   onTaskCreated: () => void;
   updateSetter: React.Dispatch<React.SetStateAction<boolean>>;
+  taskSetter: React.Dispatch<React.SetStateAction<Task[]>>;
   update: boolean;
   taskId?: string;
   task?: Task;
 }) => {
   const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
-  const [nameInputValue, setNameInputValue] = useState<string | undefined>("");
-  const [descriptionInputValue, setDescriptionInputValue] = useState<string | undefined>("");
+  const [nameInputValue, setNameInputValue] = useState<string>("");
+  const [descriptionInputValue, setDescriptionInputValue] = useState<string>("");
   const title = update ? "Edit Task" : "Create A New Task";
 
   useEffect(() => {
     if (update) {
-      setNameInputValue(task?.name);
-      setDescriptionInputValue(task?.description);
+      setNameInputValue(task!.name || "");
+      setDescriptionInputValue(task!.description || "");
     }
   }, [update, task?.name, task?.description])
 
@@ -65,14 +68,27 @@ const NewTaskModal = ({
           e.preventDefault();
           setIsSubmiting(true);
           try {
-            await (update
-              ? sendUpdatedTask(new FormData(e.currentTarget), taskId!)
-              : sendNewTask(new FormData(e.currentTarget)));
-            if (update) updateSetter(false);
+            if (update) {
+              const newTask = await sendUpdatedTask(new FormData(e.currentTarget), taskId!)
+
+              taskSetter(tasks => tasks.map(task => {
+                if (task.id === taskId) {
+                  return {...task, ...newTask}
+                }
+                return task;
+              }))
+
+
+            } else if (!update) {
+              const newTask = await sendNewTask(new FormData(e.currentTarget))
+              taskSetter(prev => [...prev, newTask])
+            }
+
             onTaskCreated();
             setShownState(false);
           } finally {
             setIsSubmiting(false);
+            updateSetter(false);
           }
         }}
         className="grid gap-4 justify-center"

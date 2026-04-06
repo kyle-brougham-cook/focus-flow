@@ -18,11 +18,6 @@ const Dashboard = () => {
   const [taskId, setTaskId] = useState("");
   const { token } = useAuth();
 
-
-  useEffect(() => {
-    fetchTasks();
-  }, [isOpen]);
-
   useEffect(() => {
     if (!token) return;
     fetchTasks();
@@ -54,6 +49,7 @@ const Dashboard = () => {
             onTaskCreated={fetchTasks}
             taskId={taskId}
             task={tasks.find(t => t.id == taskId)}
+            taskSetter={setTasks}
           />
         </>
       )}
@@ -91,9 +87,9 @@ const Dashboard = () => {
           ) : (
             tasks.map((task) => (
             <TaskComponent
+              tasksSetter={setTasks}
               key={task.id}
               task={task}
-              refreshTasks={fetchTasks}
               toggle={setIsOpen}
               modelSetting={setIsUpdate}
               taskIdSetter={setTaskId}

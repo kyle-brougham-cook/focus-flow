@@ -1,13 +1,14 @@
+import type React from "react";
 import { api } from "../api/axios";
 import type { Task } from "../types/task";
 
 
 interface Props {
+  tasksSetter: React.Dispatch<React.SetStateAction<Task[]>>
   task: Task;
   taskIdSetter: (value: string) => void;
   toggle: (value: boolean) => void;
   modelSetting: (value: boolean) => void;
-  refreshTasks: () => void;
 }
 
 const doneTask = async (id: string) => {
@@ -17,6 +18,8 @@ const doneTask = async (id: string) => {
     throw new Error(
       `there was an error in the response from our "done" api point: ${req.statusText}`
     );
+
+  return await req.data
 };
 
 const deleteTask = async (id: string) => {
@@ -32,10 +35,10 @@ const deleteTask = async (id: string) => {
 
 const TaskComponent = ({
   task,
-  refreshTasks,
   toggle,
   modelSetting,
   taskIdSetter,
+  tasksSetter,
 }: Props) => {
   return (
     <div
@@ -56,8 +59,21 @@ const TaskComponent = ({
         <button
           className="flex-1 border border-violet-600 text-violet-600 rounded hover:bg-violet-100 transition"
           onClick={async () => {
-            await doneTask(task.id);
-            refreshTasks();
+            try {
+              const resp = await doneTask(task.id);
+              tasksSetter(tasks => tasks.map(taskOld => {
+
+                if (taskOld.id === task.id) {
+                  return {...taskOld, ...resp}
+                }
+                return taskOld
+              }
+              ))
+            } catch (error: any) {
+              console.log({"Error": `setting the task to done failed due to error: ${error}`})
+            }
+
+
           }}
         >
           Done
@@ -75,8 +91,13 @@ const TaskComponent = ({
         <button
           className="flex-1 border border-violet-600 text-violet-600 rounded hover:bg-violet-100 transition"
           onClick={async () => {
-            await deleteTask(task.id);
-            refreshTasks();
+            try {
+              await deleteTask(task.id);
+              tasksSetter(tasks => tasks.filter(oldTask => oldTask.id !== task.id))
+            } catch (error: any) {
+              console.log({"Error": `deleting the task failed due to error: ${error}`})
+            }
+
           }}
         >
           Delete
