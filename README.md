@@ -8,9 +8,26 @@ Unlike many task management apps that overload users with features, Focus Flow f
 
 ## 🚀 Live Demo
 
-[WIP]
+https://focus-flow-gules.vercel.app
 
 ---
+
+## 📷 Screenshots
+
+---
+
+<div style="display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px;">
+  <a href="./screenshots/signup.png"><img src="./screenshots/signup.png" width="300" alt="Sign Up Screen"></a>
+  <a href="./screenshots/login.png"><img src="./screenshots/login.png" width="300" alt="Login Screen"></a>
+  <a href="./screenshots/dashboard.png"><img src="./screenshots/dashboard.png" width="300" alt="Dashboard"></a>
+  <a href="./screenshots/dashboard_with_settings.png"><img src="./screenshots/dashboard_with_settings.png" width="300" alt="Dashboard & Settings"></a>
+  <a href="./screenshots/task_creation_modal.png"><img src="./screenshots/task_creation_modal.png" width="300" alt="Task Creation"></a>
+  <a href="./screenshots/edit_tasks_modal.png"><img src="./screenshots/edit_tasks_modal.png" width="300" alt="Task Editing"></a>
+  <a href="./screenshots/landing.png"><img src="./screenshots/landing.png" width="300" alt="Landing"></a>
+</div>
+
+---
+
 
 ## 🛠️ Tech Stack
 
