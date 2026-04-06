@@ -1,5 +1,0 @@
-1. add logout functionality -DONE-
-2. ensure any urls are loaded via env -DONE-
-3. ensure no secrets are leaked --
-4. ensure mobile friendly -DONE-
-5. ensure backend testing is still accurate if not make it so -DONE-
