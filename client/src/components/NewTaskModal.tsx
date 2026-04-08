@@ -33,12 +33,10 @@ const NewTaskModal = ({
   taskId,
   task,
   setShownState,
-  onTaskCreated,
   updateSetter,
   taskSetter,
 }: {
   setShownState: React.Dispatch<React.SetStateAction<boolean>>;
-  onTaskCreated: () => void;
   updateSetter: React.Dispatch<React.SetStateAction<boolean>>;
   taskSetter: React.Dispatch<React.SetStateAction<Task[]>>;
   update: boolean;
@@ -84,7 +82,6 @@ const NewTaskModal = ({
               taskSetter(prev => [...prev, newTask])
             }
 
-            onTaskCreated();
             setShownState(false);
           } finally {
             setIsSubmiting(false);
